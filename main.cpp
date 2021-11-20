@@ -1,31 +1,33 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2020)
-and may not be redistributed without written permission.*/
-
-//Using SDL, standard IO, and strings
-
 #include "SDLManager.h"
+#include "Game.h"
 
 
 int main( int argc, char* args[] )
 {
+	
+	Game * game = new Game();
     SDLManager * sdl = new SDLManager();
 	//Start up SDL and create window
-	if( !sdl->init() )
-	{
-		printf( "Failed to initialize!\n" );
-	}
-	else
-	{
-		//Load media
-		if( !sdl->loadMedia() )
-		{
-			printf( "Failed to load media!\n" );
+	bool quit = false;
+
+   
+    //While application is running
+    while (!quit)
+    {	
+		USER_INPUT input = sdl->inputHandling();
+
+		if(input == QUIT)
+			quit = true;
+		else{
+			game->movePiece(input);
+
+			//collision check, then floodfill, then collision check again, etc.
 		}
-		else
-		{	
-			sdl->screenLoop();
-		}
-	}
+        sdl->drawBoard(game->getBoard());
+    }
+    
+	
+	
 
 	//Free resources and close SDL
 	sdl->close();

@@ -1,5 +1,20 @@
 #include "SDLManager.h"
 
+SDLManager::SDLManager()
+{
+    if (!init())
+    {
+        printf("Failed to initialize!\n");
+    }
+    else
+    {
+        //Load media
+        if (!loadMedia())
+        {
+            printf("Failed to load media!\n");
+        }
+    }
+}
 bool SDLManager::init()
 {
 
@@ -42,7 +57,7 @@ bool SDLManager::init()
     }
 
     return success;
-}
+};
 
 bool SDLManager::loadMedia()
 {
@@ -50,52 +65,112 @@ bool SDLManager::loadMedia()
     bool success = true;
 
     //Load PNG surface
-    gPNGSurface = IMG_Load("./res/sonic.png");
-    if (gPNGSurface == NULL)
-    {
-        printf("Failed to load PNG image!\n");
-        success = false;
-    }
+    jackPNG = IMG_Load("./res/jack32.png");
 
-    bmpTex = SDL_CreateTextureFromSurface(renderer, gPNGSurface);
-    SDL_FreeSurface(gPNGSurface);
+    jackTex = SDL_CreateTextureFromSurface(renderer, jackPNG);
+    SDL_FreeSurface(jackPNG);
 
     //Make a target texture to render too
-    texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
+    //texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     return success;
-}
+};
 
-SDL_Surface *SDLManager::loadSurface(std::string path)
+void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
 {
-    //The final optimized image
-    SDL_Surface *optimizedSurface = NULL;
 
-    //Load image at specified path
-    SDL_Surface *loadedSurface = IMG_Load(path.c_str());
-    if (loadedSurface == NULL)
+    dest.x = 0;
+    dest.y = 0;
+    dest.h = puyo_size;
+    dest.w = puyo_size;
+
+    sprite.x = 0;
+    sprite.y = 0;
+    sprite.h = puyo_size;
+    sprite.w = puyo_size;
+
+    for (int i = 0; i < board.size(); i++)
     {
-        printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
-    }
-    else
-    {
-        //Convert surface to screen format
-        optimizedSurface = SDL_ConvertSurface(loadedSurface, gScreenSurface->format, 0);
-        if (optimizedSurface == NULL)
+        for (int j = 0; j < board.at(i).size(); j++)
         {
-            printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-        }
+            if (board.at(i).at(j) != 0)
+            {
+                dest.x = i * puyo_size;
+                dest.y = j * puyo_size;
+            }
 
-        //Get rid of old loaded surface
-        SDL_FreeSurface(loadedSurface);
+            switch (board.at(i).at(j))
+            {
+            case '1':
+                SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
+                break;
+
+            default:
+                break;
+            }
+        }
     }
 
-    return optimizedSurface;
-}
+    SDL_RenderPresent(renderer);
+    SDL_RenderClear(renderer);
+};
 
-void SDLManager::screenLoop()
+USER_INPUT SDLManager::inputHandling()
 {
-    SDL_Rect spritePosition;
+    //Handle events on queue
+    while (SDL_PollEvent(&e) != 0)
+    {
+        //User requests quit
+        if (e.type == SDL_QUIT)
+        {
+            return QUIT;
+        }
+        else if (e.type == SDL_KEYDOWN)
+        {
+            //Select surfaces based on key press
+            switch (e.key.keysym.sym)
+            {
+            case SDLK_UP:
+                return UP;
+                break;
+
+            case SDLK_DOWN:
+                return DOWN;
+                break;
+
+            case SDLK_LEFT:
+                return LEFT;
+                break;
+
+            case SDLK_RIGHT:
+                return RIGHT;
+                break;
+
+            default:
+                return NONE;
+                break;
+            }
+        }
+    }
+
+    return NONE;
+};
+
+void SDLManager::close()
+{
+
+    //Destroy window
+    SDL_DestroyWindow(gWindow);
+    gWindow = NULL;
+
+    //Quit SDL subsystems
+    SDL_Quit();
+};
+
+////old screen loop
+
+/*
+SDL_Rect spritePosition;
     SDL_Rect DestR;
 
     spritePosition.x = 0;
@@ -155,7 +230,7 @@ void SDLManager::screenLoop()
 
         //Now render to the texture
 
-        SDL_RenderCopy(renderer, bmpTex, &DestR, &spritePosition);
+        SDL_RenderCopy(renderer, jackTex, &DestR, &spritePosition);
         SDL_RenderPresent(renderer);
         SDL_RenderClear(renderer);
 
@@ -168,80 +243,5 @@ void SDLManager::screenLoop()
         //Update the surface
         //SDL_UpdateWindowSurface(gWindow);
     }
-}
 
-void SDLManager::keys()
-{
-    //Main loop flag
-    bool quit = false;
-
-    //Event handler
-    SDL_Event e;
-
-    //Set default current surface
-    gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT];
-
-    //While application is running
-    while (!quit)
-    {
-        //Handle events on queue
-        while (SDL_PollEvent(&e) != 0)
-        {
-            //User requests quit
-            if (e.type == SDL_QUIT)
-            {
-                quit = true;
-            }
-            //User presses a key
-            else if (e.type == SDL_KEYDOWN)
-            {
-                //Select surfaces based on key press
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_UP:
-                    gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_UP];
-                    break;
-
-                case SDLK_DOWN:
-                    gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_DOWN];
-                    break;
-
-                case SDLK_LEFT:
-                    gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_LEFT];
-                    break;
-
-                case SDLK_RIGHT:
-                    gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_RIGHT];
-                    break;
-
-                default:
-                    gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_DEFAULT];
-                    break;
-                }
-            }
-        }
-
-        //Apply the current image
-        SDL_BlitSurface(gCurrentSurface, NULL, gScreenSurface, NULL);
-
-        //Update the surface
-        SDL_UpdateWindowSurface(gWindow);
-    }
-}
-
-void SDLManager::close()
-{
-    //Deallocate surfaces
-    for (int i = 0; i < KEY_PRESS_SURFACE_TOTAL; ++i)
-    {
-        SDL_FreeSurface(gKeyPressSurfaces[i]);
-        gKeyPressSurfaces[i] = NULL;
-    }
-
-    //Destroy window
-    SDL_DestroyWindow(gWindow);
-    gWindow = NULL;
-
-    //Quit SDL subsystems
-    SDL_Quit();
-}
+    */
