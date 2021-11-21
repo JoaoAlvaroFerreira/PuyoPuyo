@@ -1,33 +1,38 @@
 #include "SDLManager.h"
 #include "Game.h"
 
-
-int main( int argc, char* args[] )
+int main(int argc, char *args[])
 {
-	
-	Game * game = new Game();
-    SDLManager * sdl = new SDLManager();
+
+	Game *game = new Game();
+	SDLManager *sdl = new SDLManager();
 	//Start up SDL and create window
 	bool quit = false;
 
-   
-    //While application is running
-    while (!quit)
-    {	
+	//While application is running
+	while (!quit)
+	{
 		USER_INPUT input = sdl->inputHandling();
 
-		if(input == QUIT)
+		if (input == QUIT)
 			quit = true;
-		else{
-			game->movePiece(input);
+		else
+		{
 
+			if (game->collisionCheck()) //MAYBE TO SHOW ALL OF THIS ON SCREEN, CREATE COLLISION VARIABLE THAT ACTIVATES ON COLLISION CHECK AND ONLY DEACTIVATES ON GENERATE PIECE, CYCLING THROUGH EACH STEP
+			{
+				game->contactDrop(); 
+				//game->floodfill()
+				game->generatePiece();
+			}
+			else
+			{
+				game->movePiece(input);
+			}
 			//collision check, then floodfill, then collision check again, etc.
 		}
-        sdl->drawBoard(game->getBoard());
-    }
-    
-	
-	
+		sdl->drawBoard(game->getBoard());
+	}
 
 	//Free resources and close SDL
 	sdl->close();

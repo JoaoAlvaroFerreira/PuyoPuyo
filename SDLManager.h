@@ -21,7 +21,7 @@ enum USER_INPUT
 
 class SDLManager
 {
-public:
+
     //Key press surfaces constants
 
     SDL_Rect sprite;
@@ -37,22 +37,18 @@ public:
     //The window we'll be rendering to
     SDL_Window *gWindow = NULL;
 
-    //The surface contained by the window
-    SDL_Surface *gScreenSurface = NULL;
-
     SDL_Renderer *renderer = NULL;
 
+    SDL_Texture *backgroundTex = NULL;
     SDL_Texture *jackTex = NULL;
-
-    //SURFACES ARE GARBAGE, REMOVE
-
-    //Current displayed image
-    SDL_Surface *gCurrentSurface = NULL;
+    SDL_Texture *pacmanTex = NULL;
 
     //Current displayed PNG image
+    SDL_Surface *backgroundPNG = NULL;
     SDL_Surface *jackPNG = NULL;
     SDL_Surface *pacmanPNG = NULL;
 
+public:
     SDLManager();
 
     bool init();

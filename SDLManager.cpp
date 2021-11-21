@@ -64,11 +64,17 @@ bool SDLManager::loadMedia()
     //Loading success flag
     bool success = true;
 
+    backgroundPNG = IMG_Load("./res/background.png");
+    backgroundTex = SDL_CreateTextureFromSurface(renderer, backgroundPNG);
+    SDL_FreeSurface(backgroundPNG);
     //Load PNG surface
     jackPNG = IMG_Load("./res/jack32.png");
-
     jackTex = SDL_CreateTextureFromSurface(renderer, jackPNG);
     SDL_FreeSurface(jackPNG);
+
+    pacmanPNG = IMG_Load("./res/pacman32.png");
+    pacmanTex = SDL_CreateTextureFromSurface(renderer, pacmanPNG);
+    SDL_FreeSurface(pacmanPNG);
 
     //Make a target texture to render too
     //texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -78,6 +84,7 @@ bool SDLManager::loadMedia()
 
 void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
 {
+    SDL_RenderCopy(renderer, backgroundTex, NULL, NULL);
 
     dest.x = 0;
     dest.y = 0;
@@ -101,8 +108,12 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
 
             switch (board.at(i).at(j))
             {
+            
             case '1':
                 SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
+                break;
+            case '2':
+                SDL_RenderCopy(renderer, pacmanTex, &sprite, &dest);
                 break;
 
             default:
