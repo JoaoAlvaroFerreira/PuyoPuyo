@@ -14,6 +14,8 @@ enum USER_INPUT
     DOWN,
     RIGHT,
     LEFT,
+    ROTATE_RIGHT,
+    ROTATE_LEFT,
     SPACE,
     QUIT,
     NONE

@@ -9,22 +9,34 @@ int main(int argc, char *args[])
 	//Start up SDL and create window
 	bool quit = false;
 
+	
+
 	//While application is running
 	while (!quit)
 	{
 		USER_INPUT input = sdl->inputHandling();
+
+		
 
 		if (input == QUIT)
 			quit = true;
 		else
 		{
 
+
 			if (game->collisionCheck()) //MAYBE TO SHOW ALL OF THIS ON SCREEN, CREATE COLLISION VARIABLE THAT ACTIVATES ON COLLISION CHECK AND ONLY DEACTIVATES ON GENERATE PIECE, CYCLING THROUGH EACH STEP
-			{
+			{	
+				
+				
 				game->contactDrop(); 
-				//game->floodfill()
+				
+
+				//////////while loop for floodfills that only ends once no more floodfills are available
+				//check for floodfills on collCheck
 				game->generatePiece();
+				
 			}
+			
 			else
 			{
 				game->movePiece(input);

@@ -40,6 +40,7 @@
         "xutility": "cpp",
         "cctype": "cpp",
         "string": "cpp",
-        "array": "cpp"
+        "array": "cpp",
+        "vector": "cpp"
     }
 }

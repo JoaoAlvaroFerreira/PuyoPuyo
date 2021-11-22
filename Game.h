@@ -1,4 +1,6 @@
 #include <array>
+#include <vector>
+#include <bits/stdc++.h>
 #include "SDLManager.h"
 
 using namespace std;
@@ -11,10 +13,10 @@ class Game
     enum PIECE_ROTATION
     {
         NEUTRAL,     //a b
-        SECOND_DOWN, //a
+        CLOCKWISE, //a
                      //b
         REVERSE,     //b a
-        SECOND_UP,   //b
+        COUNTER_CLOCKWISE,   //b
                      //a
     };
 
@@ -39,14 +41,41 @@ class Game
     int start_x = 3;
     int start_y = 0;
 
+    ///Flood fill done on contact blocks, and then each row that gets dropped
+    std::vector<Block> checkedBlocks = {};
+    std::vector<Block> currentFlood = {};
+    int floodCounter = 0;
+
+    
+
+
+
+
 public:
     Game();
+    void clearPieceOnBoard();
+    void printPieceOnBoard();
     void movePiece(USER_INPUT input);
-    void rotatePiece();
+    void rotatePiece(bool right);
     void boardMovement(int shiftX, int shiftY);
+
     bool collisionCheck();
+    bool groundCheck();
+    bool pieceCollisionCheck();
+
+
+    /////do Drop for
     void contactDrop();
-    void contactDropAux(Block block);
+    void columnDrop(int column);
+
+    void floodFillStarter(int x, int y);
+    void floodFill(int x, int y);
+    void floodFillColumn(int column); //////do after every delete & drop
+    bool isBlockChecked(int x, int y);
+
+    void deleteFloodfillBlocks();
+
+
     void generatePiece();
     array<array<char, 16>, 8> getBoard()
     {

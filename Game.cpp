@@ -31,10 +31,129 @@ void Game::generatePiece()
     game_board[firstBlock.posX][firstBlock.posY] = firstBlock.num;
     game_board[secondBlock.posX][secondBlock.posY] = secondBlock.num;
     boardMovement(0, 0);
+
+    checkedBlocks = {};
 }
 
-void Game::rotatePiece()
+void Game::clearPieceOnBoard()
 {
+    game_board[player.a.posX][player.a.posY] = '0';
+    game_board[player.b.posX][player.b.posY] = '0';
+}
+
+void Game::printPieceOnBoard()
+{
+    game_board[player.a.posX][player.a.posY] = player.a.num;
+    game_board[player.b.posX][player.b.posY] = player.b.num;
+}
+
+void Game::rotatePiece(bool right)
+{
+
+    clearPieceOnBoard();
+
+    if (right)
+    {
+        switch (player.orientation)
+        {
+        case NEUTRAL:
+
+            if (player.a.posY < 15 && game_board[player.a.posX][player.a.posY + 1] == '0')
+            {
+                player.orientation = CLOCKWISE;
+
+                player.b.posX = player.a.posX;
+                player.b.posY = player.a.posY + 1;
+            }
+
+            break;
+
+        case CLOCKWISE:
+            if (player.a.posX > 0 && game_board[player.a.posX - 1][player.a.posY] == '0')
+            {
+                player.orientation = REVERSE;
+
+                player.b.posX = player.a.posX - 1;
+                player.b.posY = player.a.posY;
+            }
+            break;
+        case REVERSE:
+
+            if (player.a.posY > 0 && game_board[player.a.posX][player.a.posY - 1] == '0')
+            {
+                player.orientation = COUNTER_CLOCKWISE;
+
+                player.b.posX = player.a.posX;
+                player.b.posY = player.a.posY - 1;
+            }
+            break;
+        case COUNTER_CLOCKWISE:
+
+            if (player.a.posX < 7 && game_board[player.a.posX + 1][player.a.posY] == '0')
+            {
+                player.orientation = NEUTRAL;
+
+                player.b.posX = player.a.posX + 1;
+                player.b.posY = player.a.posY;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    else
+    {
+        switch (player.orientation)
+        {
+        case NEUTRAL:
+
+            if (player.a.posY > 0 && game_board[player.a.posX][player.a.posY - 1] == '0')
+            {
+                player.orientation = COUNTER_CLOCKWISE;
+
+                player.b.posX = player.a.posX;
+                player.b.posY = player.a.posY - 1;
+            }
+
+            break;
+
+        case CLOCKWISE:
+
+            if (player.a.posX < 7 && game_board[player.a.posX + 1][player.a.posY] == '0')
+            {
+                player.orientation = NEUTRAL;
+
+                player.b.posX = player.a.posX + 1;
+                player.b.posY = player.a.posY;
+            }
+            break;
+        case REVERSE:
+
+            if (player.a.posY < 15 && game_board[player.a.posX][player.a.posY + 1] == '0')
+            {
+                player.orientation = CLOCKWISE;
+
+                player.b.posX = player.a.posX;
+                player.b.posY = player.a.posY + 1;
+            }
+            break;
+        case COUNTER_CLOCKWISE:
+
+            if (player.a.posX > 0 && game_board[player.a.posX - 1][player.a.posY] == '0')
+            {
+                player.orientation = REVERSE;
+
+                player.b.posX = player.a.posX - 1;
+                player.b.posY = player.a.posY;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    printPieceOnBoard();
 }
 
 void Game::movePiece(USER_INPUT input)
@@ -42,15 +161,16 @@ void Game::movePiece(USER_INPUT input)
 
     switch (input)
     {
-        /*
+
     case UP: ////////////CHECK THAT YOU CAN'T DELETE PIECES FROM BELOW OR BY SPINNING
+
         if (player.a.posY > 0 && player.b.posY > 0)
         {
-            boardMovement(0,-1);
-            
+            boardMovement(0, -1);
         }
+
         break;
-        */
+
     case DOWN:
         if (player.a.posY < 15 && player.b.posY < 15)
         {
@@ -70,6 +190,21 @@ void Game::movePiece(USER_INPUT input)
         }
         break;
 
+    case ROTATE_RIGHT:
+        rotatePiece(true);
+        break;
+
+    case ROTATE_LEFT:
+        rotatePiece(false);
+        break;
+
+    case SPACE:
+        if (player.a.posY < 15 && player.b.posY < 15)
+        {
+            boardMovement(0, 1);
+        }
+        break;
+
     default:
         break;
     }
@@ -77,8 +212,7 @@ void Game::movePiece(USER_INPUT input)
 
 void Game::boardMovement(int shiftX, int shiftY)
 {
-    game_board[player.a.posX][player.a.posY] = '0';
-    game_board[player.b.posX][player.b.posY] = '0';
+    clearPieceOnBoard();
 
     player.a.posX = player.a.posX + shiftX;
     player.b.posX = player.b.posX + shiftX;
@@ -86,15 +220,13 @@ void Game::boardMovement(int shiftX, int shiftY)
     player.a.posY = player.a.posY + shiftY;
     player.b.posY = player.b.posY + shiftY;
 
-    game_board[player.a.posX][player.a.posY] = player.a.num;
-    game_board[player.b.posX][player.b.posY] = player.b.num;
+    printPieceOnBoard();
 }
 
 bool Game::collisionCheck()
 {
 
-    // || game_board[player.a.posX][player.a.posY+1] != '0' || game_board[player.b.posX][player.a.posY+1] != '0'
-    if (player.a.posY == 15 || player.b.posY == 15 || game_board[player.a.posX][player.a.posY + 1] != '0' || game_board[player.b.posX][player.a.posY + 1] != '0')
+    if (groundCheck() || pieceCollisionCheck())
     {
         return true;
     }
@@ -102,36 +234,195 @@ bool Game::collisionCheck()
     return false;
 }
 
+bool Game::groundCheck()
+{
+    if (player.a.posY == 15 || player.b.posY == 15)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool Game::pieceCollisionCheck()
+{
+    switch (player.orientation)
+    {
+
+    case CLOCKWISE:
+
+        if (game_board[player.b.posX][player.b.posY + 1] != '0')
+        {
+            return true;
+        }
+
+        return false;
+        break;
+
+    case COUNTER_CLOCKWISE:
+
+        if (game_board[player.a.posX][player.a.posY + 1] != '0')
+        {
+            return true;
+        }
+
+        return false;
+        break;
+
+    default:
+
+        if (game_board[player.a.posX][player.a.posY + 1] != '0' || game_board[player.b.posX][player.b.posY + 1] != '0')
+        {
+            return true;
+        }
+
+        return false;
+
+        break;
+    }
+}
+
 void Game::contactDrop()
 {
 
     if (game_board[player.a.posX][player.a.posY + 1] == '0' && player.a.posY != 15)
     {
-        
-        contactDropAux(player.a);
+
+        columnDrop(player.a.posX);
     }
-    else if (game_board[player.b.posX][player.b.posY + 1] == '0' && player.b.posY != 15)
+    else
     {
-        contactDropAux(player.b);
+        floodFillStarter(player.a.posX, player.a.posY);
+    }
+
+    if (game_board[player.b.posX][player.b.posY + 1] == '0' && player.b.posY != 15)
+    {
+        columnDrop(player.b.posX);
+    }
+    else
+    {
+        floodFillStarter(player.b.posX, player.b.posY);
     }
 }
 
-void Game::contactDropAux(Block block) ///WILL HAVE TO BE REWORKED TO DROP ENTIRE COLUMN INSTEAD OF JUST ONE PUYO, do it by saving the above puyos on an array, finding the contact like now and then re-writing them on top
+void Game::columnDrop(int column)
 {
 
     bool contact = false;
-    int i = block.posY;
-    while(!contact)
+    std::vector<char> aux;
+    int l = 0;
+
+    for (int i = 0; i < game_board[column].size(); i++)
     {
-
-        if (game_board[block.posX][ i + 1] != '0' || i == 15)
-        {
-            game_board[block.posX][block.posY] = '0';
-            game_board[block.posX][ i ] = block.num;
-
-            contact = true;
-           
-        }
-        i++;
+        if (game_board[column][i] != '0')
+            aux.push_back(game_board[column][i]);
     }
+
+    for (int j = 0; j < game_board[column].size(); j++)
+    {
+        if (j < game_board[column].size() - aux.size())
+        {
+            game_board[column][j] = '0';
+        }
+        else
+        {
+            game_board[column][j] = aux[l];
+            l++;
+        }
+    }
+
+    if (l > 0)
+        floodFillColumn(column);
+}
+
+
+
+void Game::floodFillColumn(int column)
+{
+
+    for (int i = 0; i < game_board[column].size(); i++)
+    {
+        if (game_board[column][i] != '0')
+        {
+            floodFillStarter(column, i);
+        }
+    }
+}
+
+void Game::floodFillStarter(int x, int y)
+{
+
+    currentFlood = {};
+    floodCounter = 0;
+
+    floodFill(x, y);
+
+    
+    if (floodCounter > 3)
+    {
+        
+        deleteFloodfillBlocks();
+    }
+
+    currentFlood = {};
+    floodCounter = 0;
+}
+
+void Game::floodFill(int x, int y)
+{
+    char c = game_board[x][y];
+    Block b = {c, x, y};
+    floodCounter++;
+
+   
+
+    checkedBlocks.push_back(b);
+    currentFlood.push_back(b);
+
+    // Recursively call for north, east, south and west
+
+    if (game_board[x + 1][y] == c && !isBlockChecked(x + 1, y))
+        floodFill(x + 1, y);
+
+    if (game_board[x - 1][y] == c && !isBlockChecked(x - 1, y))
+        floodFill(x - 1, y);
+
+    if (game_board[x][y + 1] == c && !isBlockChecked(x, y + 1))
+        floodFill(x, y + 1);
+
+    if (game_board[x][y - 1] == c && !isBlockChecked(x, y - 1))
+        floodFill(x, y - 1);
+}
+
+bool Game::isBlockChecked(int x, int y)
+{
+
+    for (size_t i = 0; i < checkedBlocks.size(); i++)
+    {
+        if (checkedBlocks[i].posX == x && checkedBlocks[i].posY == y)
+            return true;
+    }
+
+    return false;
+}
+
+void Game::deleteFloodfillBlocks()
+{
+    ////////print order
+    std::vector<int> columns = {};
+
+    for (size_t i = 0; i < currentFlood.size(); i++)
+    {
+        game_board[0][i] = '1';
+        game_board[currentFlood[i].posX][currentFlood[i].posY] = '0';
+        columns.push_back(currentFlood[i].posX);
+    }
+
+    sort(columns.begin(), columns.end());
+    columns.erase(unique(columns.begin(), columns.end()), columns.end());
+
+    for (int x : columns)
+        columnDrop(x);
+
+    ////////print order
 }
