@@ -2,6 +2,8 @@
 #include <vector>
 #include <bits/stdc++.h>
 #include "SDLManager.h"
+#include <unistd.h>
+
 
 using namespace std;
 
@@ -41,7 +43,7 @@ class Game
     int start_x = 3;
     int start_y = 0;
 
-    ///Flood fill done on contact blocks, and then each row that gets dropped
+    ///Flood fill done on contact blocks, and then each col that gets dropped
     std::vector<Block> checkedBlocks = {};
     std::vector<Block> currentFlood = {};
     int floodCounter = 0;

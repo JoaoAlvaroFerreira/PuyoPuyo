@@ -178,7 +178,7 @@ void Game::movePiece(USER_INPUT input)
         }
         break;
     case LEFT:
-        if (player.a.posX > 0 && player.b.posX > 0)
+        if (player.a.posX > 0 && player.b.posX > 0) /////////WRITE THE CHECKS FOR WHEN YOU BUMP INTO PIECES SIDEWAYS, INCLUDING ALL ORIENTATIONS, ALSO FIX CHECK DROP
         {
             boardMovement(-1, 0);
         }
@@ -308,9 +308,10 @@ void Game::contactDrop()
 void Game::columnDrop(int column)
 {
 
-    bool contact = false;
+    
     std::vector<char> aux;
     int l = 0;
+    game_board[0][0] = '1';
 
     for (int i = 0; i < game_board[column].size(); i++)
     {
@@ -328,11 +329,12 @@ void Game::columnDrop(int column)
         {
             game_board[column][j] = aux[l];
             l++;
+
+           
         }
     }
 
-    if (l > 0)
-        floodFillColumn(column);
+    floodFillColumn(column);
 }
 
 
@@ -356,6 +358,9 @@ void Game::floodFillStarter(int x, int y)
     floodCounter = 0;
 
     floodFill(x, y);
+
+
+    ////ele chega às quatro e apaga, fazer esperar
 
     
     if (floodCounter > 3)
@@ -397,9 +402,9 @@ void Game::floodFill(int x, int y)
 bool Game::isBlockChecked(int x, int y)
 {
 
-    for (size_t i = 0; i < checkedBlocks.size(); i++)
+    for (size_t i = 0; i < currentFlood.size(); i++)
     {
-        if (checkedBlocks[i].posX == x && checkedBlocks[i].posY == y)
+        if (currentFlood[i].posX == x && currentFlood[i].posY == y)
             return true;
     }
 
@@ -413,16 +418,15 @@ void Game::deleteFloodfillBlocks()
 
     for (size_t i = 0; i < currentFlood.size(); i++)
     {
-        game_board[0][i] = '1';
+        
         game_board[currentFlood[i].posX][currentFlood[i].posY] = '0';
+        
         columns.push_back(currentFlood[i].posX);
     }
 
-    sort(columns.begin(), columns.end());
-    columns.erase(unique(columns.begin(), columns.end()), columns.end());
-
-    for (int x : columns)
-        columnDrop(x);
+    
+    for (int j = 0; j < columns.size();j++)
+        columnDrop(columns[j]);
 
     ////////print order
 }
