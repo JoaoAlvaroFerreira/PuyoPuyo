@@ -1,8 +1,10 @@
 #include <array>
 #include <vector>
 #include <bits/stdc++.h>
-#include "SDLManager.h"
 #include <unistd.h>
+#include <random>
+
+#include "SDLManager.h"
 
 
 using namespace std;
@@ -47,6 +49,8 @@ class Game
     std::vector<Block> checkedBlocks = {};
     std::vector<Block> currentFlood = {};
     int floodCounter = 0;
+
+    char possibleBlocks[4] = { '1', '2', '3', '4'};
 
     
 

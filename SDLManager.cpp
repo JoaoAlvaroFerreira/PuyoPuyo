@@ -68,13 +68,23 @@ bool SDLManager::loadMedia()
     backgroundTex = SDL_CreateTextureFromSurface(renderer, backgroundPNG);
     SDL_FreeSurface(backgroundPNG);
     //Load PNG surface
-    jackPNG = IMG_Load("./res/jack32.png");
+    jackPNG = IMG_Load("./res/jack32.png"); 
     jackTex = SDL_CreateTextureFromSurface(renderer, jackPNG);
     SDL_FreeSurface(jackPNG);
 
     pacmanPNG = IMG_Load("./res/pacman32.png");
     pacmanTex = SDL_CreateTextureFromSurface(renderer, pacmanPNG);
     SDL_FreeSurface(pacmanPNG);
+
+    
+    angryBirdPNG = IMG_Load("./res/Red32.png");
+    angryBirdTex = SDL_CreateTextureFromSurface(renderer, angryBirdPNG);
+    SDL_FreeSurface(angryBirdPNG);
+
+    
+    greenPNG = IMG_Load("./res/1Up32.png");
+    greenTex = SDL_CreateTextureFromSurface(renderer, greenPNG);
+    SDL_FreeSurface(greenPNG);
 
     //Make a target texture to render too
     //texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -86,6 +96,7 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
 {
     SDL_RenderCopy(renderer, backgroundTex, NULL, NULL);
 
+     
     dest.x = 0;
     dest.y = 0;
     dest.h = puyo_size;
@@ -102,8 +113,8 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
         {
             if (board.at(i).at(j) != 0)
             {
-                dest.x = i * puyo_size;
-                dest.y = j * puyo_size;
+                dest.x = i * puyo_size + board_start_w;
+                dest.y = j * puyo_size + board_start_h;
             }
 
             switch (board.at(i).at(j))
@@ -114,6 +125,12 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
                 break;
             case '2':
                 SDL_RenderCopy(renderer, pacmanTex, &sprite, &dest);
+                break;
+            case '3':
+                SDL_RenderCopy(renderer, angryBirdTex, &sprite, &dest);
+                break;
+            case '4':
+                SDL_RenderCopy(renderer, greenTex, &sprite, &dest);
                 break;
 
             default:

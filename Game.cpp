@@ -15,11 +15,15 @@ Game::Game()
 
 void Game::generatePiece()
 {
-    firstBlock = {'1',
+    
+    int cOne = rand() % 4;
+    int cTwo = rand() % 4;
+    
+    firstBlock = {possibleBlocks[cOne],
                   start_x,
                   start_y};
 
-    secondBlock = {'2',
+    secondBlock = {possibleBlocks[cTwo],
                    start_x + 1,
                    start_y};
 
@@ -269,10 +273,16 @@ bool Game::pieceCollisionCheck()
         return false;
         break;
 
-    default:
+    default: //////////bug is here
 
-        if (game_board[player.a.posX][player.a.posY + 1] != '0' || game_board[player.b.posX][player.b.posY + 1] != '0')
+        if (game_board[player.a.posX][player.a.posY + 1] != '0')
         {
+
+            return true;
+        }
+        else if (game_board[player.b.posX][player.b.posY + 1] != '0')
+        {
+
             return true;
         }
 
@@ -308,10 +318,8 @@ void Game::contactDrop()
 void Game::columnDrop(int column)
 {
 
-    
-    std::vector<char> aux;
+    std::vector<char> aux = {};
     int l = 0;
-    game_board[0][0] = '1';
 
     for (int i = 0; i < game_board[column].size(); i++)
     {
@@ -329,15 +337,11 @@ void Game::columnDrop(int column)
         {
             game_board[column][j] = aux[l];
             l++;
-
-           
         }
     }
 
     floodFillColumn(column);
 }
-
-
 
 void Game::floodFillColumn(int column)
 {
@@ -359,13 +363,11 @@ void Game::floodFillStarter(int x, int y)
 
     floodFill(x, y);
 
-
     ////ele chega às quatro e apaga, fazer esperar
 
-    
     if (floodCounter > 3)
     {
-        
+
         deleteFloodfillBlocks();
     }
 
@@ -379,27 +381,37 @@ void Game::floodFill(int x, int y)
     Block b = {c, x, y};
     floodCounter++;
 
-   
-
     checkedBlocks.push_back(b);
     currentFlood.push_back(b);
 
     // Recursively call for north, east, south and west
 
-    if (game_board[x + 1][y] == c && !isBlockChecked(x + 1, y))
-        floodFill(x + 1, y);
+    if (x < 7)
+    {
+        if (game_board[x + 1][y] == c && !isBlockChecked(x + 1, y))
+            floodFill(x + 1, y);
+    }
 
-    if (game_board[x - 1][y] == c && !isBlockChecked(x - 1, y))
-        floodFill(x - 1, y);
+    if (x > 0)
+    {
+        if (game_board[x - 1][y] == c && !isBlockChecked(x - 1, y))
+            floodFill(x - 1, y);
+    }
 
-    if (game_board[x][y + 1] == c && !isBlockChecked(x, y + 1))
-        floodFill(x, y + 1);
+    if (y < 15)
+    {
+        if (game_board[x][y + 1] == c && !isBlockChecked(x, y + 1))
+            floodFill(x, y + 1);
+    }
 
-    if (game_board[x][y - 1] == c && !isBlockChecked(x, y - 1))
-        floodFill(x, y - 1);
+    if (y > 0)
+    {
+        if (game_board[x][y - 1] == c && !isBlockChecked(x, y - 1))
+            floodFill(x, y - 1);
+    }
 }
 
-bool Game::isBlockChecked(int x, int y)
+bool Game::isBlockChecked(int x, int y) //////////CHECKED BLOCKS IS USELESS, MAYBE DELETE
 {
 
     for (size_t i = 0; i < currentFlood.size(); i++)
@@ -418,14 +430,13 @@ void Game::deleteFloodfillBlocks()
 
     for (size_t i = 0; i < currentFlood.size(); i++)
     {
-        
+
         game_board[currentFlood[i].posX][currentFlood[i].posY] = '0';
-        
+
         columns.push_back(currentFlood[i].posX);
     }
 
-    
-    for (int j = 0; j < columns.size();j++)
+    for (int j = 0; j < columns.size(); j++)
         columnDrop(columns[j]);
 
     ////////print order
