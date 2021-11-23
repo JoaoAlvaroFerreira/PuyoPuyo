@@ -65,6 +65,9 @@ public:
     void rotatePiece(bool right);
     void boardMovement(int shiftX, int shiftY);
 
+    bool rightCheck();
+    bool leftCheck();
+
     bool collisionCheck();
     bool groundCheck();
     bool pieceCollisionCheck();
@@ -83,6 +86,8 @@ public:
 
 
     void generatePiece();
+    bool checkLose();
+    
     array<array<char, 16>, 8> getBoard()
     {
         return game_board;

@@ -15,10 +15,10 @@ Game::Game()
 
 void Game::generatePiece()
 {
-    
+
     int cOne = rand() % 4;
     int cTwo = rand() % 4;
-    
+
     firstBlock = {possibleBlocks[cOne],
                   start_x,
                   start_y};
@@ -37,6 +37,16 @@ void Game::generatePiece()
     boardMovement(0, 0);
 
     checkedBlocks = {};
+}
+
+bool Game::checkLose()
+{
+    if (game_board[start_x][start_y] != '0' || game_board[start_x + 1][start_y] != '0')
+    {
+        return true;
+    }
+
+    return false;
 }
 
 void Game::clearPieceOnBoard()
@@ -168,10 +178,7 @@ void Game::movePiece(USER_INPUT input)
 
     case UP: ////////////CHECK THAT YOU CAN'T DELETE PIECES FROM BELOW OR BY SPINNING
 
-        if (player.a.posY > 0 && player.b.posY > 0)
-        {
-            boardMovement(0, -1);
-        }
+        ///INSTA-DROP
 
         break;
 
@@ -182,13 +189,13 @@ void Game::movePiece(USER_INPUT input)
         }
         break;
     case LEFT:
-        if (player.a.posX > 0 && player.b.posX > 0) /////////WRITE THE CHECKS FOR WHEN YOU BUMP INTO PIECES SIDEWAYS, INCLUDING ALL ORIENTATIONS, ALSO FIX CHECK DROP
+        if (player.a.posX > 0 && player.b.posX > 0 && leftCheck()) /////////WRITE THE CHECKS FOR WHEN YOU BUMP INTO PIECES SIDEWAYS, INCLUDING ALL ORIENTATIONS, ALSO FIX CHECK DROP
         {
             boardMovement(-1, 0);
         }
         break;
     case RIGHT:
-        if (player.a.posX < 7 && player.b.posX < 7)
+        if (player.a.posX < 7 && player.b.posX < 7 && rightCheck())
         {
             boardMovement(1, 0);
         }
@@ -212,6 +219,59 @@ void Game::movePiece(USER_INPUT input)
     default:
         break;
     }
+}
+
+bool Game::leftCheck()
+{
+    switch (player.orientation)
+    {
+    case NEUTRAL:
+        if (game_board[player.a.posX - 1][player.a.posY] == '0')
+            return true;
+        else
+            return false;
+        break;
+    case REVERSE:
+        if (game_board[player.b.posX - 1][player.b.posY] == '0')
+            return true;
+        else
+            return false;
+        break;
+    default:
+        if (game_board[player.a.posX - 1][player.a.posY] == '0' || game_board[player.b.posX - 1][player.b.posY]  == '0')
+            return true;
+        else
+            return false;
+    }
+
+    return true;
+}
+
+bool Game::rightCheck()
+{
+    
+    switch (player.orientation)
+    {
+    case REVERSE:
+        if (game_board[player.a.posX + 1][player.a.posY]  == '0')
+            return true;
+        else
+            return false;
+        break;
+    case NEUTRAL:
+        if (game_board[player.b.posX + 1][player.b.posY]  == '0')
+            return true;
+        else
+            return false;
+        break;
+    default:
+        if (game_board[player.a.posX + 1][player.a.posY]  == '0' || game_board[player.b.posX + 1][player.b.posY] == '0')
+            return true;
+        else
+            return false;
+    }
+
+    return true;
 }
 
 void Game::boardMovement(int shiftX, int shiftY)

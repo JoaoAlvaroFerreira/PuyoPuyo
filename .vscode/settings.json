@@ -41,6 +41,11 @@
         "cctype": "cpp",
         "string": "cpp",
         "array": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "chrono": "cpp",
+        "algorithm": "cpp",
+        "random": "cpp",
+        "ratio": "cpp",
+        "thread": "cpp"
     }
 }

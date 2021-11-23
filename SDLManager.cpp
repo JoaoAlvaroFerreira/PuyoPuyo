@@ -158,25 +158,31 @@ USER_INPUT SDLManager::inputHandling()
             //Select surfaces based on key press
             switch (e.key.keysym.sym)
             {
+            case SDLK_UP:
             case SDLK_w:
                 return UP;
                 break;
 
+            case SDLK_DOWN:
             case SDLK_s:
                 return DOWN;
                 break;
 
+            case SDLK_RIGHT:
             case SDLK_d:
                 return RIGHT;
                 break;
 
+            case SDLK_LEFT:
             case SDLK_a:
                 return LEFT;
                 break;
-            case SDLK_e:
+            case SDLK_c:
+            case SDLK_q:
                 return ROTATE_RIGHT;
                 break;
-            case SDLK_q:
+            case SDLK_z:
+            case SDLK_e:
                 return ROTATE_LEFT;
                 break;
             case SDLK_SPACE:
