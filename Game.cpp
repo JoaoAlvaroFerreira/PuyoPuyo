@@ -6,12 +6,62 @@ Game::Game()
     {
         for (int j = 0; j < game_board.at(i).size(); j++)
         {
-            game_board[i][j] = '0';
+            game_board[i][j] = EMPTY_SPACE;
         }
     }
 
     generatePiece();
 };
+
+void Game::gameLoop()
+{
+
+    bool quit = false;
+    std::chrono::time_point<std::chrono::system_clock> start;
+    std::chrono::duration<double> time_aux;
+    start = std::chrono::system_clock::now();
+    double duration_speed = 0.5;
+
+    //While application is running
+    while (!quit)
+    {
+        USER_INPUT input = sdl->inputHandling();
+
+        if (input == QUIT)
+            quit = true;
+        else
+        {
+            time_aux = std::chrono::system_clock::now() - start;
+
+            if (time_aux.count() > duration_speed)
+            {
+                movePiece(DOWN);
+                start = std::chrono::system_clock::now();
+            }
+
+            if (collisionCheck()) //MAYBE TO SHOW ALL OF THIS ON SCREEN, CREATE COLLISION VARIABLE THAT ACTIVATES ON COLLISION CHECK AND ONLY DEACTIVATES ON GENERATE PIECE, CYCLING THROUGH EACH STEP
+            {
+
+                contactDrop();
+
+                if (checkLose())
+                {
+                    quit = true;
+                }
+                else
+                {
+                    generatePiece();
+                }
+            }
+            else
+            {
+                movePiece(input);
+            }
+            //collision check, then floodfill, then collision check again, etc.
+        }
+        sdl->drawBoard(getBoard(), getScore(), 0);
+    }
+}
 
 void Game::generatePiece()
 {
@@ -41,7 +91,7 @@ void Game::generatePiece()
 
 bool Game::checkLose()
 {
-    if (game_board[start_x][start_y] != '0' || game_board[start_x + 1][start_y] != '0')
+    if (game_board[start_x][start_y] != EMPTY_SPACE || game_board[start_x + 1][start_y] != EMPTY_SPACE)
     {
         return true;
     }
@@ -51,8 +101,8 @@ bool Game::checkLose()
 
 void Game::clearPieceOnBoard()
 {
-    game_board[player.a.posX][player.a.posY] = '0';
-    game_board[player.b.posX][player.b.posY] = '0';
+    game_board[player.a.posX][player.a.posY] = EMPTY_SPACE;
+    game_board[player.b.posX][player.b.posY] = EMPTY_SPACE;
 }
 
 void Game::printPieceOnBoard()
@@ -72,7 +122,7 @@ void Game::rotatePiece(bool right)
         {
         case NEUTRAL:
 
-            if (player.a.posY < 15 && game_board[player.a.posX][player.a.posY + 1] == '0')
+            if (player.a.posY < 15 && game_board[player.a.posX][player.a.posY + 1] == EMPTY_SPACE)
             {
                 player.orientation = CLOCKWISE;
 
@@ -83,7 +133,7 @@ void Game::rotatePiece(bool right)
             break;
 
         case CLOCKWISE:
-            if (player.a.posX > 0 && game_board[player.a.posX - 1][player.a.posY] == '0')
+            if (player.a.posX > 0 && game_board[player.a.posX - 1][player.a.posY] == EMPTY_SPACE)
             {
                 player.orientation = REVERSE;
 
@@ -93,7 +143,7 @@ void Game::rotatePiece(bool right)
             break;
         case REVERSE:
 
-            if (player.a.posY > 0 && game_board[player.a.posX][player.a.posY - 1] == '0')
+            if (player.a.posY > 0 && game_board[player.a.posX][player.a.posY - 1] == EMPTY_SPACE)
             {
                 player.orientation = COUNTER_CLOCKWISE;
 
@@ -103,7 +153,7 @@ void Game::rotatePiece(bool right)
             break;
         case COUNTER_CLOCKWISE:
 
-            if (player.a.posX < 7 && game_board[player.a.posX + 1][player.a.posY] == '0')
+            if (player.a.posX < 7 && game_board[player.a.posX + 1][player.a.posY] == EMPTY_SPACE)
             {
                 player.orientation = NEUTRAL;
 
@@ -122,7 +172,7 @@ void Game::rotatePiece(bool right)
         {
         case NEUTRAL:
 
-            if (player.a.posY > 0 && game_board[player.a.posX][player.a.posY - 1] == '0')
+            if (player.a.posY > 0 && game_board[player.a.posX][player.a.posY - 1] == EMPTY_SPACE)
             {
                 player.orientation = COUNTER_CLOCKWISE;
 
@@ -134,7 +184,7 @@ void Game::rotatePiece(bool right)
 
         case CLOCKWISE:
 
-            if (player.a.posX < 7 && game_board[player.a.posX + 1][player.a.posY] == '0')
+            if (player.a.posX < 7 && game_board[player.a.posX + 1][player.a.posY] == EMPTY_SPACE)
             {
                 player.orientation = NEUTRAL;
 
@@ -144,7 +194,7 @@ void Game::rotatePiece(bool right)
             break;
         case REVERSE:
 
-            if (player.a.posY < 15 && game_board[player.a.posX][player.a.posY + 1] == '0')
+            if (player.a.posY < 15 && game_board[player.a.posX][player.a.posY + 1] == EMPTY_SPACE)
             {
                 player.orientation = CLOCKWISE;
 
@@ -154,7 +204,7 @@ void Game::rotatePiece(bool right)
             break;
         case COUNTER_CLOCKWISE:
 
-            if (player.a.posX > 0 && game_board[player.a.posX - 1][player.a.posY] == '0')
+            if (player.a.posX > 0 && game_board[player.a.posX - 1][player.a.posY] == EMPTY_SPACE)
             {
                 player.orientation = REVERSE;
 
@@ -226,19 +276,19 @@ bool Game::leftCheck()
     switch (player.orientation)
     {
     case NEUTRAL:
-        if (game_board[player.a.posX - 1][player.a.posY] == '0')
+        if (game_board[player.a.posX - 1][player.a.posY] == EMPTY_SPACE)
             return true;
         else
             return false;
         break;
     case REVERSE:
-        if (game_board[player.b.posX - 1][player.b.posY] == '0')
+        if (game_board[player.b.posX - 1][player.b.posY] == EMPTY_SPACE)
             return true;
         else
             return false;
         break;
     default:
-        if (game_board[player.a.posX - 1][player.a.posY] == '0' || game_board[player.b.posX - 1][player.b.posY]  == '0')
+        if (game_board[player.a.posX - 1][player.a.posY] == EMPTY_SPACE || game_board[player.b.posX - 1][player.b.posY] == EMPTY_SPACE)
             return true;
         else
             return false;
@@ -249,23 +299,23 @@ bool Game::leftCheck()
 
 bool Game::rightCheck()
 {
-    
+
     switch (player.orientation)
     {
     case REVERSE:
-        if (game_board[player.a.posX + 1][player.a.posY]  == '0')
+        if (game_board[player.a.posX + 1][player.a.posY] == EMPTY_SPACE)
             return true;
         else
             return false;
         break;
     case NEUTRAL:
-        if (game_board[player.b.posX + 1][player.b.posY]  == '0')
+        if (game_board[player.b.posX + 1][player.b.posY] == EMPTY_SPACE)
             return true;
         else
             return false;
         break;
     default:
-        if (game_board[player.a.posX + 1][player.a.posY]  == '0' || game_board[player.b.posX + 1][player.b.posY] == '0')
+        if (game_board[player.a.posX + 1][player.a.posY] == EMPTY_SPACE || game_board[player.b.posX + 1][player.b.posY] == EMPTY_SPACE)
             return true;
         else
             return false;
@@ -315,7 +365,7 @@ bool Game::pieceCollisionCheck()
 
     case CLOCKWISE:
 
-        if (game_board[player.b.posX][player.b.posY + 1] != '0')
+        if (game_board[player.b.posX][player.b.posY + 1] != EMPTY_SPACE)
         {
             return true;
         }
@@ -325,7 +375,7 @@ bool Game::pieceCollisionCheck()
 
     case COUNTER_CLOCKWISE:
 
-        if (game_board[player.a.posX][player.a.posY + 1] != '0')
+        if (game_board[player.a.posX][player.a.posY + 1] != EMPTY_SPACE)
         {
             return true;
         }
@@ -335,12 +385,12 @@ bool Game::pieceCollisionCheck()
 
     default: //////////bug is here
 
-        if (game_board[player.a.posX][player.a.posY + 1] != '0')
+        if (game_board[player.a.posX][player.a.posY + 1] != EMPTY_SPACE)
         {
 
             return true;
         }
-        else if (game_board[player.b.posX][player.b.posY + 1] != '0')
+        else if (game_board[player.b.posX][player.b.posY + 1] != EMPTY_SPACE)
         {
 
             return true;
@@ -355,7 +405,7 @@ bool Game::pieceCollisionCheck()
 void Game::contactDrop()
 {
 
-    if (game_board[player.a.posX][player.a.posY + 1] == '0' && player.a.posY != 15)
+    if (game_board[player.a.posX][player.a.posY + 1] == EMPTY_SPACE && player.a.posY != 15)
     {
 
         columnDrop(player.a.posX);
@@ -365,7 +415,7 @@ void Game::contactDrop()
         floodFillStarter(player.a.posX, player.a.posY);
     }
 
-    if (game_board[player.b.posX][player.b.posY + 1] == '0' && player.b.posY != 15)
+    if (game_board[player.b.posX][player.b.posY + 1] == EMPTY_SPACE && player.b.posY != 15)
     {
         columnDrop(player.b.posX);
     }
@@ -383,7 +433,7 @@ void Game::columnDrop(int column)
 
     for (int i = 0; i < game_board[column].size(); i++)
     {
-        if (game_board[column][i] != '0')
+        if (game_board[column][i] != EMPTY_SPACE)
             aux.push_back(game_board[column][i]);
     }
 
@@ -391,7 +441,7 @@ void Game::columnDrop(int column)
     {
         if (j < game_board[column].size() - aux.size())
         {
-            game_board[column][j] = '0';
+            game_board[column][j] = EMPTY_SPACE;
         }
         else
         {
@@ -408,7 +458,7 @@ void Game::floodFillColumn(int column)
 
     for (int i = 0; i < game_board[column].size(); i++)
     {
-        if (game_board[column][i] != '0')
+        if (game_board[column][i] != EMPTY_SPACE)
         {
             floodFillStarter(column, i);
         }
@@ -422,8 +472,6 @@ void Game::floodFillStarter(int x, int y)
     floodCounter = 0;
 
     floodFill(x, y);
-
-    ////ele chega às quatro e apaga, fazer esperar
 
     if (floodCounter > 3)
     {
@@ -443,8 +491,6 @@ void Game::floodFill(int x, int y)
 
     checkedBlocks.push_back(b);
     currentFlood.push_back(b);
-
-    // Recursively call for north, east, south and west
 
     if (x < 7)
     {
@@ -471,7 +517,7 @@ void Game::floodFill(int x, int y)
     }
 }
 
-bool Game::isBlockChecked(int x, int y) //////////CHECKED BLOCKS IS USELESS, MAYBE DELETE
+bool Game::isBlockChecked(int x, int y)
 {
 
     for (size_t i = 0; i < currentFlood.size(); i++)
@@ -488,16 +534,26 @@ void Game::deleteFloodfillBlocks()
     ////////print order
     std::vector<int> columns = {};
 
+    sdl->drawBoard(getBoard(), getScore(), 300);
     for (size_t i = 0; i < currentFlood.size(); i++)
     {
 
-        game_board[currentFlood[i].posX][currentFlood[i].posY] = '0';
+        game_board[currentFlood[i].posX][currentFlood[i].posY] = EMPTY_SPACE;
 
         columns.push_back(currentFlood[i].posX);
     }
 
+    
+
     for (int j = 0; j < columns.size(); j++)
         columnDrop(columns[j]);
 
+    high_score = high_score + 100;
+
+    
     ////////print order
+}
+
+void Game::deleteBlocksEffect(){
+    
 }

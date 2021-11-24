@@ -53,6 +53,13 @@ bool SDLManager::init()
 
                 renderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
             }
+
+            //Initialize SDL_ttf
+            if (TTF_Init() == -1)
+            {
+                printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+                success = false;
+            }
         }
     }
 
@@ -68,7 +75,7 @@ bool SDLManager::loadMedia()
     backgroundTex = SDL_CreateTextureFromSurface(renderer, backgroundPNG);
     SDL_FreeSurface(backgroundPNG);
     //Load PNG surface
-    jackPNG = IMG_Load("./res/jack32.png"); 
+    jackPNG = IMG_Load("./res/jack32.png");
     jackTex = SDL_CreateTextureFromSurface(renderer, jackPNG);
     SDL_FreeSurface(jackPNG);
 
@@ -76,12 +83,10 @@ bool SDLManager::loadMedia()
     pacmanTex = SDL_CreateTextureFromSurface(renderer, pacmanPNG);
     SDL_FreeSurface(pacmanPNG);
 
-    
     angryBirdPNG = IMG_Load("./res/Red32.png");
     angryBirdTex = SDL_CreateTextureFromSurface(renderer, angryBirdPNG);
     SDL_FreeSurface(angryBirdPNG);
 
-    
     greenPNG = IMG_Load("./res/1Up32.png");
     greenTex = SDL_CreateTextureFromSurface(renderer, greenPNG);
     SDL_FreeSurface(greenPNG);
@@ -89,14 +94,15 @@ bool SDLManager::loadMedia()
     //Make a target texture to render too
     //texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+    font = TTF_OpenFont( "res/impact.ttf", 28 );
+
     return success;
 };
 
-void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
+void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score, float delay)
 {
     SDL_RenderCopy(renderer, backgroundTex, NULL, NULL);
 
-     
     dest.x = 0;
     dest.y = 0;
     dest.h = puyo_size;
@@ -119,7 +125,7 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
 
             switch (board.at(i).at(j))
             {
-            
+
             case '1':
                 SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
                 break;
@@ -139,7 +145,23 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
         }
     }
 
+    ////WRITE TEXT
+
+    std::string score_text = "Score: " + std::to_string(score);
+    SDL_Color textColor = {255, 255, 255, 0};
+    SDL_Surface *textSurface = TTF_RenderText_Solid(font, score_text.c_str(), textColor);
+    SDL_Texture *text = SDL_CreateTextureFromSurface(renderer, textSurface);
+    int text_width = textSurface->w;
+    int text_height = textSurface->h;
+    SDL_FreeSurface(textSurface);
+    SDL_Rect renderQuad = {20, SCREEN_HEIGHT - 30, text_width, text_height};
+    SDL_RenderCopy(renderer, text, NULL, &renderQuad);
+    SDL_DestroyTexture(text);
+
     SDL_RenderPresent(renderer);
+
+    SDL_Delay(delay);
+    
     SDL_RenderClear(renderer);
 };
 

@@ -6,6 +6,7 @@
 #include <array>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <string>
 
 enum USER_INPUT
@@ -43,8 +44,10 @@ class SDLManager
 
     SDL_Renderer *renderer = NULL;
 
-    SDL_Texture *backgroundTex = NULL;
+    TTF_Font *font = NULL;
 
+    SDL_Texture *mTexture = NULL;
+    SDL_Texture *backgroundTex = NULL;
     SDL_Texture *jackTex = NULL;
     SDL_Texture *pacmanTex = NULL;
     SDL_Texture *angryBirdTex = NULL;
@@ -66,7 +69,7 @@ public:
 
     USER_INPUT inputHandling();
 
-    void drawBoard(std::array<std::array<char, 16>, 8> board);
+    void drawBoard(std::array<std::array<char, 16>, 8> board, int score, float delay);
 
     void keys();
 

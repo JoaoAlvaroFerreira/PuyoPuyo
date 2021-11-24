@@ -50,7 +50,14 @@ class Game
     std::vector<Block> currentFlood = {};
     int floodCounter = 0;
 
+    char EMPTY_SPACE = '0';
     char possibleBlocks[4] = { '1', '2', '3', '4'};
+
+    int high_score = 0;
+    int score_multiplier = 1;
+    int difficulty_level = 1;
+
+    SDLManager* sdl;
 
     
 
@@ -59,6 +66,10 @@ class Game
 
 public:
     Game();
+
+    void gameLoop();
+
+    void setGraphics(SDLManager* sdl_manager){  sdl = sdl_manager;};
     void clearPieceOnBoard();
     void printPieceOnBoard();
     void movePiece(USER_INPUT input);
@@ -92,4 +103,8 @@ public:
     {
         return game_board;
     };
+
+    int getScore(){
+        return high_score;
+    }
 };

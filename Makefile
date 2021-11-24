@@ -4,7 +4,7 @@ INCLUDE_PATHS = -I${CURDIR}\SDL2\include\SDL2
 
 LIBRARY_PATHS = -L${CURDIR}\SDL2\lib
 
-LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
+LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf
 
 COMPILER_FLAGS = -w -Wl,-subsystem,windows
 
