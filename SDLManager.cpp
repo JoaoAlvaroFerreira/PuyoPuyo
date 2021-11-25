@@ -60,6 +60,12 @@ bool SDLManager::init()
                 printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
                 success = false;
             }
+
+            if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) < 0)
+            {
+                printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+                success = false;
+            }
         }
     }
 
@@ -70,6 +76,31 @@ bool SDLManager::loadMedia()
 {
     //Loading success flag
     bool success = true;
+
+    //Load music
+    gMusic = Mix_LoadMUS("res/fh.wav");
+    if (gMusic == NULL)
+    {
+        printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
+
+    //Load sound effects
+    gScratch = Mix_LoadWAV("res/hammer.wav");
+    if (gScratch == NULL)
+    {
+        printf("Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
+    ///////////images
+
+    startMenuPNG = IMG_Load("./res/start_menu.png");
+    startMenuTex = SDL_CreateTextureFromSurface(renderer, startMenuPNG);
+    SDL_FreeSurface(startMenuPNG);
+
+    gameOverPNG = IMG_Load("./res/game_over.png");
+    gameOverTex = SDL_CreateTextureFromSurface(renderer, gameOverPNG);
+    SDL_FreeSurface(gameOverPNG);
 
     backgroundPNG = IMG_Load("./res/background.png");
     backgroundTex = SDL_CreateTextureFromSurface(renderer, backgroundPNG);
@@ -94,7 +125,7 @@ bool SDLManager::loadMedia()
     //Make a target texture to render too
     //texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    font = TTF_OpenFont( "res/impact.ttf", 28 );
+    font = TTF_OpenFont("res/impact.ttf", 28);
 
     return success;
 };
@@ -161,7 +192,7 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score,
     SDL_RenderPresent(renderer);
 
     SDL_Delay(delay);
-    
+
     SDL_RenderClear(renderer);
 };
 
@@ -182,6 +213,7 @@ USER_INPUT SDLManager::inputHandling()
             {
             case SDLK_UP:
             case SDLK_w:
+                Mix_PlayChannel(-1, gScratch, 0);
                 return UP;
                 break;
 
@@ -220,14 +252,38 @@ USER_INPUT SDLManager::inputHandling()
     return NONE;
 };
 
+void SDLManager::drawScene(int scene)
+{
+    if (Mix_PlayingMusic() == 0)
+    {
+        //Play the music
+        Mix_PlayMusic(gMusic, -1);
+    }
+    
+
+    if (scene == 0)
+        SDL_RenderCopy(renderer, startMenuTex, NULL, NULL);
+    else if (scene == 1)
+        SDL_RenderCopy(renderer, gameOverTex, NULL, NULL);
+
+    SDL_RenderPresent(renderer);
+
+    SDL_RenderClear(renderer);
+}
+
 void SDLManager::close()
 {
 
+    Mix_FreeChunk(gScratch);
+    Mix_FreeMusic(gMusic);
     //Destroy window
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
 
     //Quit SDL subsystems
+    Mix_Quit();
+    IMG_Quit();
     SDL_Quit();
 };
 

@@ -7,6 +7,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include <string>
 
 enum USER_INPUT
@@ -34,8 +35,8 @@ class SDLManager
     //Screen dimension constants
     const int SCREEN_WIDTH = 1024;
     const int SCREEN_HEIGHT = 600;
-    int board_start_h = (SCREEN_HEIGHT - 512)/2;
-    int board_start_w = (SCREEN_WIDTH - 256)/2;
+    int board_start_h = (SCREEN_HEIGHT - 512) / 2;
+    int board_start_w = (SCREEN_WIDTH - 256) / 2;
 
     SDL_Event e;
 
@@ -47,6 +48,8 @@ class SDLManager
     TTF_Font *font = NULL;
 
     SDL_Texture *mTexture = NULL;
+    SDL_Texture *startMenuTex = NULL;
+    SDL_Texture *gameOverTex = NULL;
     SDL_Texture *backgroundTex = NULL;
     SDL_Texture *jackTex = NULL;
     SDL_Texture *pacmanTex = NULL;
@@ -54,11 +57,20 @@ class SDLManager
     SDL_Texture *greenTex = NULL;
 
     //Current displayed PNG image
+    SDL_Surface *startMenuPNG = NULL;
+    SDL_Surface *gameOverPNG = NULL;
     SDL_Surface *backgroundPNG = NULL;
     SDL_Surface *jackPNG = NULL;
     SDL_Surface *pacmanPNG = NULL;
     SDL_Surface *angryBirdPNG = NULL;
     SDL_Surface *greenPNG = NULL;
+
+    ///audio
+    //The music that will be played
+    Mix_Music *gMusic = NULL;
+
+    //The sound effects that will be used
+    Mix_Chunk *gScratch = NULL;
 
 public:
     SDLManager();
@@ -70,6 +82,8 @@ public:
     USER_INPUT inputHandling();
 
     void drawBoard(std::array<std::array<char, 16>, 8> board, int score, float delay);
+
+    void drawScene(int scene);
 
     void keys();
 

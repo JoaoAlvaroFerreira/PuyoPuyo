@@ -38,9 +38,12 @@ class Game
         int orientation;
     };
 
+
+
     Piece player;
     Block firstBlock;
     Block secondBlock;
+   
 
     int start_x = 3;
     int start_y = 0;
@@ -67,7 +70,7 @@ class Game
 public:
     Game();
 
-    void gameLoop();
+    int gameLoop();
 
     void setGraphics(SDLManager* sdl_manager){  sdl = sdl_manager;};
     void clearPieceOnBoard();
@@ -95,7 +98,7 @@ public:
 
     void deleteFloodfillBlocks();
 
-
+    void deleteBlocksEffect();
     void generatePiece();
     bool checkLose();
     

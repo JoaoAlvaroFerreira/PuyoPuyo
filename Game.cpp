@@ -13,7 +13,7 @@ Game::Game()
     generatePiece();
 };
 
-void Game::gameLoop()
+int Game::gameLoop()
 {
 
     bool quit = false;
@@ -27,8 +27,9 @@ void Game::gameLoop()
     {
         USER_INPUT input = sdl->inputHandling();
 
-        if (input == QUIT)
+        if (input == QUIT){
             quit = true;
+        }
         else
         {
             time_aux = std::chrono::system_clock::now() - start;
@@ -47,6 +48,7 @@ void Game::gameLoop()
                 if (checkLose())
                 {
                     quit = true;
+                    return 1;
                 }
                 else
                 {
@@ -61,6 +63,8 @@ void Game::gameLoop()
         }
         sdl->drawBoard(getBoard(), getScore(), 0);
     }
+
+    return 0;
 }
 
 void Game::generatePiece()
