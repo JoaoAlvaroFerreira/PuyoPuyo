@@ -16,4 +16,4 @@ puyo : $(OBJS)
 	$(CC) $(OBJS) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o  $(EXECUTABLE)
 
 clean:
-	rm -rf *o puyo.exe
+	rm -rf *o ..\puyo.exe
