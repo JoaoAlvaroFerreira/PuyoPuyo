@@ -72,6 +72,14 @@ class SDLManager
     //The sound effects that will be used
     Mix_Chunk *gScratch = NULL;
 
+
+    SDL_Color textColor = {255, 255, 255, 0};
+    SDL_Surface *textSurface;
+    SDL_Texture *text;
+    int text_width;
+    int text_height;
+    SDL_Rect renderQuad;
+
 public:
     SDLManager();
 
@@ -81,7 +89,9 @@ public:
 
     USER_INPUT inputHandling();
 
-    void drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::array<std::array<char, 2>,3> pieceList, char holding[2], float delay);
+    void drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::array<std::array<char, 2>,3> pieceList, char holding[2], std::string message, float delay);
+
+    void drawMessage(std::string message, int x, int y);
 
     void playSoundEffect();
 

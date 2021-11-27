@@ -130,7 +130,7 @@ bool SDLManager::loadMedia()
     return success;
 };
 
-void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::array<std::array<char, 2>, 3> pieceList, char holding[2], float delay) /////////////CLEAN UP ASAP
+void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay) /////////////CLEAN UP ASAP
 {
     SDL_RenderCopy(renderer, backgroundTex, NULL, NULL);
 
@@ -273,15 +273,10 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score,
     ////WRITE TEXT
 
     std::string score_text = "Score: " + std::to_string(score);
-    SDL_Color textColor = {255, 255, 255, 0};
-    SDL_Surface *textSurface = TTF_RenderText_Solid(font, score_text.c_str(), textColor);
-    SDL_Texture *text = SDL_CreateTextureFromSurface(renderer, textSurface);
-    int text_width = textSurface->w;
-    int text_height = textSurface->h;
-    SDL_FreeSurface(textSurface);
-    SDL_Rect renderQuad = {20, SCREEN_HEIGHT - 30, text_width, text_height};
-    SDL_RenderCopy(renderer, text, NULL, &renderQuad);
-    SDL_DestroyTexture(text);
+    drawMessage(score_text, 50, SCREEN_HEIGHT - 50);
+
+    if(message.compare(" "))
+        drawMessage(message, 50, 50);
 
     SDL_RenderPresent(renderer);
 
@@ -311,7 +306,6 @@ USER_INPUT SDLManager::inputHandling()
             {
             case SDLK_UP:
             case SDLK_w:
-                
                 return UP;
                 break;
 
@@ -350,6 +344,19 @@ USER_INPUT SDLManager::inputHandling()
     return NONE;
 };
 
+void SDLManager::drawMessage(std::string message,  int x, int y){
+    
+    textSurface = TTF_RenderText_Solid(font, message.c_str(), textColor);
+    text = SDL_CreateTextureFromSurface(renderer, textSurface);
+    text_width = textSurface->w;
+    text_height = textSurface->h;
+    SDL_FreeSurface(textSurface);
+    renderQuad = {x, y, text_width, text_height};
+    SDL_RenderCopy(renderer, text, NULL, &renderQuad);
+    SDL_DestroyTexture(text);
+
+}
+
 void SDLManager::drawScene(int scene)
 {
     if (Mix_PlayingMusic() == 0)
@@ -373,7 +380,7 @@ void SDLManager::close()
 
     Mix_FreeChunk(gScratch);
     Mix_FreeMusic(gMusic);
-    //Destroy window
+    //Destroy window;
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;
@@ -382,83 +389,4 @@ void SDLManager::close()
     Mix_Quit();
     IMG_Quit();
     SDL_Quit();
-};
-
-////old screen loop
-
-/*
-SDL_Rect spritePosition;
-    SDL_Rect DestR;
-
-    spritePosition.x = 0;
-    spritePosition.y = 0;
-    spritePosition.h = sonic_height;
-    spritePosition.w = sonic_width;
-
-    DestR.x = 0;
-    DestR.y = 0;
-    DestR.w = sonic_width;
-    DestR.h = sonic_height;
-
-    //Main loop flag
-    bool quit = false;
-
-    //Event handler
-    SDL_Event e;
-
-    //While application is running
-    while (!quit)
-    {
-        //Handle events on queue
-        while (SDL_PollEvent(&e) != 0)
-        {
-            //User requests quit
-            if (e.type == SDL_QUIT)
-            {
-                quit = true;
-            }
-            else if (e.type == SDL_KEYDOWN)
-            {
-                //Select surfaces based on key press
-                switch (e.key.keysym.sym)
-                {
-                case SDLK_UP:
-                    spritePosition.y -= 2;
-
-                    break;
-
-                case SDLK_DOWN:
-                    spritePosition.y += 2;
-                    break;
-
-                case SDLK_LEFT:
-                    spritePosition.x -= 2;
-                    break;
-
-                case SDLK_RIGHT:
-                    spritePosition.x += 2;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-        }
-
-        //Now render to the texture
-
-        SDL_RenderCopy(renderer, jackTex, &DestR, &spritePosition);
-        SDL_RenderPresent(renderer);
-        SDL_RenderClear(renderer);
-
-        //Detach the texture
-        //SDL_SetRenderTarget(renderer, NULL);
-        //Apply the PNG image
-        //SDL_RenderClear(gScreenSurface);
-        //SDL_BlitSurface(gPNGSurface, NULL, gScreenSurface, &spritePosition);
-
-        //Update the surface
-        //SDL_UpdateWindowSurface(gWindow);
-    }
-
-    */
+}

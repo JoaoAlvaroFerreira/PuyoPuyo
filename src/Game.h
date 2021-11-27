@@ -60,6 +60,10 @@ class Game
     char EMPTY_SPACE = '0';
     char possibleBlocks[4] = {'1', '2', '3', '4'};
 
+    std::chrono::time_point<std::chrono::system_clock> messageClock;
+    std::string currentMessage = " ";
+    double messageTime = 2;
+
     SDLManager *sdl;
 
     public:
@@ -81,9 +85,8 @@ class Game
     bool groundCheck();
     bool pieceCollisionCheck();
 
-    /////do Drop for
     void contactDrop();
-    void columnDrop(int column);
+    void columnDrop(int column, bool multiple);
 
     void floodFillStarter(int x, int y);
     void floodFill(int x, int y);
@@ -98,7 +101,9 @@ class Game
     void assignPiece(bool hold);
     void convertNextPieces();
     void hold();
+    void setMessage(std::string message);
 
+    bool emptyBoardCheck();
     bool checkLose();
 
     array<array<char, 16>, 8> getBoard()

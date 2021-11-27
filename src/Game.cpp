@@ -42,6 +42,13 @@ int Game::gameLoop()
                 start = std::chrono::system_clock::now();
             }
 
+            time_aux = std::chrono::system_clock::now() - messageClock;
+
+            if (time_aux.count() > messageTime)
+            {
+                currentMessage = " ";
+            }
+
             if (collisionCheck())
             {
 
@@ -62,7 +69,7 @@ int Game::gameLoop()
                 movePiece(input);
             }
         }
-        sdl->drawBoard(getBoard(), getScore(), nextPiecesDrawable, holdingDrawable, 0);
+        sdl->drawBoard(getBoard(), getScore(), nextPiecesDrawable, holdingDrawable, currentMessage, 0);
     }
 
     return 0;
@@ -486,7 +493,7 @@ void Game::contactDrop()
     if (gameBoard[player.a.posX][player.a.posY + 1] == EMPTY_SPACE && player.a.posY != 15)
     {
 
-        columnDrop(player.a.posX);
+        columnDrop(player.a.posX, false);
     }
     else
     {
@@ -495,7 +502,7 @@ void Game::contactDrop()
 
     if (gameBoard[player.b.posX][player.b.posY + 1] == EMPTY_SPACE && player.b.posY != 15)
     {
-        columnDrop(player.b.posX);
+        columnDrop(player.b.posX, false);
     }
     else
     {
@@ -503,7 +510,7 @@ void Game::contactDrop()
     }
 }
 
-void Game::columnDrop(int column)
+void Game::columnDrop(int column, bool multiple)
 {
 
     std::vector<char> aux = {};
@@ -528,7 +535,8 @@ void Game::columnDrop(int column)
         }
     }
 
-    floodFillColumn(column);
+    if(!multiple)
+        floodFillColumn(column);
 }
 
 void Game::floodFillColumn(int column)
@@ -609,12 +617,12 @@ bool Game::isBlockChecked(int x, int y)
 
 void Game::deleteFloodfillBlocks()
 {
-    
+
     std::vector<int> columns = {};
 
     array<array<char, 16>, 8> oldBoard = getBoard();
 
-    for (size_t i = 0; i < currentFlood.size(); i++)
+    for (int i = 0; i < currentFlood.size(); i++)
     {
 
         gameBoard[currentFlood[i].posX][currentFlood[i].posY] = EMPTY_SPACE;
@@ -625,11 +633,20 @@ void Game::deleteFloodfillBlocks()
     deleteBlocksEffect(oldBoard);
 
     for (int j = 0; j < columns.size(); j++)
-        columnDrop(columns[j]);
+        columnDrop(columns[j], true);
+
+    for (int k = 0; k < columns.size(); k++)
+    {
+        floodFillColumn(columns[k]);
+    }
 
     highScore = highScore + 100;
 
-
+    if (emptyBoardCheck())
+    {
+        setMessage("FULL CLEAR !");
+        highScore = highScore + 1000;
+    }
 }
 
 void Game::deleteBlocksEffect(array<array<char, 16>, 8> oldBoard)
@@ -638,8 +655,25 @@ void Game::deleteBlocksEffect(array<array<char, 16>, 8> oldBoard)
     for (int i = 0; i < 5; i++)
     {
 
-        sdl->drawBoard(oldBoard, getScore(), nextPiecesDrawable, holdingDrawable, 50);
-        sdl->drawBoard(getBoard(), getScore(), nextPiecesDrawable, holdingDrawable, 50);
+        sdl->drawBoard(oldBoard, getScore(), nextPiecesDrawable, holdingDrawable, currentMessage, 50);
+        sdl->drawBoard(getBoard(), getScore(), nextPiecesDrawable, holdingDrawable, currentMessage, 50);
     }
     sdl->playSoundEffect();
+}
+
+void Game::setMessage(std::string newMessage)
+{
+    currentMessage = newMessage;
+    messageClock = std::chrono::system_clock::now();
+}
+
+bool Game::emptyBoardCheck()
+{
+
+    for (int i = 0; i < 8; i++)
+    {
+        if (gameBoard[i][15] != EMPTY_SPACE)
+            return false;
+    }
+    return true;
 }
