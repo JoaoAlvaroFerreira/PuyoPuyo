@@ -1,14 +1,22 @@
 #ifndef SDLManager_H
 #define SDLManager_H
 
-#include <stdio.h>
-#include <iostream>
-#include <array>
+#ifdef _WIN32
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
+#else
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
+#endif
 #include <string>
+#include <stdio.h>
+#include <iostream>
+#include <array>
+#include <vector>
 
 enum USER_INPUT
 {
@@ -35,8 +43,8 @@ class SDLManager
     //Screen dimension constants
     const int SCREEN_WIDTH = 1024;
     const int SCREEN_HEIGHT = 600;
-    int board_start_h = (SCREEN_HEIGHT - (puyo_size*16)) / 2;
-    int board_start_w = (SCREEN_WIDTH - (puyo_size*8)) / 2;
+    int board_start_h = (SCREEN_HEIGHT - (puyo_size * 16)) / 2;
+    int board_start_w = (SCREEN_WIDTH - (puyo_size * 8)) / 2;
 
     SDL_Event e;
 
@@ -70,8 +78,9 @@ class SDLManager
     Mix_Music *gMusic = NULL;
 
     //The sound effects that will be used
-    Mix_Chunk *gScratch = NULL;
-
+    Mix_Chunk *tone1 = NULL;
+    Mix_Chunk *tone2 = NULL;
+    Mix_Chunk *tone3 = NULL;
 
     SDL_Color textColor = {255, 255, 255, 0};
     SDL_Surface *textSurface;
@@ -89,11 +98,13 @@ public:
 
     USER_INPUT inputHandling();
 
-    void drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::array<std::array<char, 2>,3> pieceList, char holding[2], std::string message, float delay);
+    void drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay);
 
     void drawMessage(std::string message, int x, int y);
 
-    void playSoundEffect();
+    void drawScores(std::vector<int> scores);
+
+    void playSoundEffect(int i);
 
     void drawScene(int scene);
 

@@ -1,5 +1,7 @@
 #include "SDLManager.h"
 #include "Game.h"
+#include "Utils.h"
+
 
 #include <chrono>
 
@@ -13,6 +15,7 @@ enum SCENE
 };
 
 SCENE currentScene = START_MENU;
+
 
 void startMenuLoop(SDLManager *sdl)
 {

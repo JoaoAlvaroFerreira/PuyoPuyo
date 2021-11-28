@@ -8,7 +8,7 @@ LINKER_FLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer 
 
 COMPILER_FLAGS = -Wl,-subsystem,windows 
 
-OBJS = main.cpp SDLManager.cpp Game.cpp my1.res
+OBJS = main.cpp SDLManager.cpp Game.cpp Utils.cpp my1.res
 
 EXECUTABLE = ..\puyo
 

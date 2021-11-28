@@ -10,6 +10,7 @@ Game::Game()
         }
     }
 
+    scores = read_scores();
     initPieces();
     assignPiece(false);
 };
@@ -21,8 +22,8 @@ int Game::gameLoop()
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::duration<double> time_aux;
     start = std::chrono::system_clock::now();
-    double duration_speed = 0.5;
-
+    difficultyLevel = 0;
+    game_speed = 0.6 - difficultyLevel * 0.05;
     //While application is running
     while (!quit)
     {
@@ -36,7 +37,7 @@ int Game::gameLoop()
         {
             time_aux = std::chrono::system_clock::now() - start;
 
-            if (time_aux.count() > duration_speed)
+            if (time_aux.count() > game_speed)
             {
                 movePiece(DOWN);
                 start = std::chrono::system_clock::now();
@@ -69,8 +70,12 @@ int Game::gameLoop()
                 movePiece(input);
             }
         }
-        sdl->drawBoard(getBoard(), getScore(), nextPiecesDrawable, holdingDrawable, currentMessage, 0);
+        sdl->drawBoard(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 0);
     }
+
+    scores.push_back(highScore);
+    std::sort(scores.begin(), scores.end());
+    write_scores(scores);
 
     return 0;
 }
@@ -427,6 +432,7 @@ bool Game::collisionCheck()
 
     if (groundCheck() || pieceCollisionCheck())
     {
+        comboCounter = 0;
         return true;
     }
 
@@ -468,7 +474,7 @@ bool Game::pieceCollisionCheck()
         return false;
         break;
 
-    default: //////////bug is here
+    default:
 
         if (gameBoard[player.a.posX][player.a.posY + 1] != EMPTY_SPACE)
         {
@@ -490,27 +496,21 @@ bool Game::pieceCollisionCheck()
 void Game::contactDrop()
 {
 
-    if (gameBoard[player.a.posX][player.a.posY + 1] == EMPTY_SPACE && player.a.posY != 15)
+    if (gameBoard[player.a.posX][player.a.posY + 1] == EMPTY_SPACE)
     {
 
         columnDrop(player.a.posX, false);
     }
-    else
-    {
-        floodFillStarter(player.a.posX, player.a.posY);
-    }
-
-    if (gameBoard[player.b.posX][player.b.posY + 1] == EMPTY_SPACE && player.b.posY != 15)
+    else if (gameBoard[player.b.posX][player.b.posY + 1] == EMPTY_SPACE)
     {
         columnDrop(player.b.posX, false);
     }
-    else
-    {
-        floodFillStarter(player.b.posX, player.b.posY);
-    }
+
+    floodFillColumn(player.a.posX);
+    floodFillColumn(player.b.posX);
 }
 
-void Game::columnDrop(int column, bool multiple)
+void Game::columnDrop(int column, bool multiple) ///////REMOVE THE MULTIPLE
 {
 
     std::vector<char> aux = {};
@@ -534,9 +534,6 @@ void Game::columnDrop(int column, bool multiple)
             l++;
         }
     }
-
-    if(!multiple)
-        floodFillColumn(column);
 }
 
 void Game::floodFillColumn(int column)
@@ -557,16 +554,20 @@ void Game::floodFillStarter(int x, int y)
     currentFlood = {};
     floodCounter = 0;
 
-    floodFill(x, y);
-
-    if (floodCounter > 3)
+    if (gameBoard[x][y] != EMPTY_SPACE)
     {
 
-        deleteFloodfillBlocks();
-    }
+        floodFill(x, y);
 
-    currentFlood = {};
-    floodCounter = 0;
+        if (floodCounter > 3)
+        {
+
+            deleteFloodfillBlocks();
+        }
+
+        currentFlood = {};
+        floodCounter = 0;
+    }
 }
 
 void Game::floodFill(int x, int y)
@@ -631,6 +632,8 @@ void Game::deleteFloodfillBlocks()
     }
 
     deleteBlocksEffect(oldBoard);
+    comboCounter++;
+    highScore = highScore + (10 * currentFlood.size() * comboCounter) * (difficultyLevel * 0.2 + 1);
 
     for (int j = 0; j < columns.size(); j++)
         columnDrop(columns[j], true);
@@ -640,13 +643,19 @@ void Game::deleteFloodfillBlocks()
         floodFillColumn(columns[k]);
     }
 
-    highScore = highScore + 100;
+    if (comboCounter > 1)
+    {
+        std::string str = "Chain x" + std::to_string(comboCounter);
+        setMessage(str);
+    }
 
     if (emptyBoardCheck())
     {
         setMessage("FULL CLEAR !");
-        highScore = highScore + 1000;
+        highScore = highScore + 500;
     }
+
+    difficultyCheck();
 }
 
 void Game::deleteBlocksEffect(array<array<char, 16>, 8> oldBoard)
@@ -655,10 +664,10 @@ void Game::deleteBlocksEffect(array<array<char, 16>, 8> oldBoard)
     for (int i = 0; i < 5; i++)
     {
 
-        sdl->drawBoard(oldBoard, getScore(), nextPiecesDrawable, holdingDrawable, currentMessage, 50);
-        sdl->drawBoard(getBoard(), getScore(), nextPiecesDrawable, holdingDrawable, currentMessage, 50);
+        sdl->drawBoard(oldBoard, getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
+        sdl->drawBoard(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
     }
-    sdl->playSoundEffect();
+    sdl->playSoundEffect(1);
 }
 
 void Game::setMessage(std::string newMessage)
@@ -676,4 +685,19 @@ bool Game::emptyBoardCheck()
             return false;
     }
     return true;
+}
+
+void Game::difficultyCheck()
+{
+
+    if (difficultyLevel < sizeof(difficultyTresholds) / sizeof(difficultyTresholds[0]))
+    {
+        if (highScore > difficultyTresholds[difficultyLevel])
+        {
+            difficultyLevel++;
+            game_speed = 0.6 - difficultyLevel * 0.1;
+            std::string str = "Difficulty level:" + std::to_string(difficultyLevel);
+            setMessage(str);
+        }
+    }
 }

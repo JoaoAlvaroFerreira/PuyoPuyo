@@ -86,13 +86,9 @@ bool SDLManager::loadMedia()
     }
 
     //Load sound effects
-    gScratch = Mix_LoadWAV("res/hammer.wav");
-    if (gScratch == NULL)
-    {
-        printf("Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError());
-        success = false;
-    }
-    ///////////images
+    tone1 = Mix_LoadWAV("res/hammer.wav");
+    tone2 = Mix_LoadWAV("res/metal.wav");
+    tone3 = Mix_LoadWAV("res/gulp.wav");
 
     startMenuPNG = IMG_Load("./res/start_menu.png");
     startMenuTex = SDL_CreateTextureFromSurface(renderer, startMenuPNG);
@@ -130,7 +126,7 @@ bool SDLManager::loadMedia()
     return success;
 };
 
-void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay) /////////////CLEAN UP ASAP
+void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay) /////////////CLEAN UP ASAP
 {
     SDL_RenderCopy(renderer, backgroundTex, NULL, NULL);
 
@@ -143,6 +139,8 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score,
     sprite.y = 0;
     sprite.h = puyo_size;
     sprite.w = puyo_size;
+
+    drawScores(scores);
 
     for (int i = 0; i < board.size(); i++)
     {
@@ -225,7 +223,6 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score,
         }
     }
 
-
     dest.x = board_start_w - puyo_size * 2;
     dest.y = board_start_h;
     switch (holding[0])
@@ -275,7 +272,7 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score,
     std::string score_text = "Score: " + std::to_string(score);
     drawMessage(score_text, 50, SCREEN_HEIGHT - 50);
 
-    if(message.compare(" "))
+    if (message.compare(" "))
         drawMessage(message, 50, 50);
 
     SDL_RenderPresent(renderer);
@@ -285,8 +282,48 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score,
     SDL_RenderClear(renderer);
 };
 
-void SDLManager::playSoundEffect(){
-    Mix_PlayChannel(-1, gScratch, 0);
+void SDLManager::drawScores(std::vector<int> scores)
+{
+    for (int i = 0; i < scores.size(); i++)
+    {
+
+        textSurface = TTF_RenderText_Solid(font, std::to_string(scores[i]).c_str(), textColor);
+        text = SDL_CreateTextureFromSurface(renderer, textSurface);
+        text_width = textSurface->w;
+        text_height = textSurface->h;
+        SDL_FreeSurface(textSurface);
+        renderQuad = {50, i*text_height, text_width, text_height};
+        SDL_RenderCopy(renderer, text, NULL, &renderQuad);
+        SDL_DestroyTexture(text);
+    }
+}
+void SDLManager::drawMessage(std::string message, int x, int y)
+{
+
+    textSurface = TTF_RenderText_Solid(font, message.c_str(), textColor);
+    text = SDL_CreateTextureFromSurface(renderer, textSurface);
+    text_width = textSurface->w;
+    text_height = textSurface->h;
+    SDL_FreeSurface(textSurface);
+    renderQuad = {x, y, text_width, text_height};
+    SDL_RenderCopy(renderer, text, NULL, &renderQuad);
+    SDL_DestroyTexture(text);
+}
+
+void SDLManager::playSoundEffect(int i)
+{
+    switch (i)
+    {
+    case 1:
+        Mix_PlayChannel(-1, tone1, 0);
+        break;
+    case 2:
+        Mix_PlayChannel(-1, tone2, 0);
+        break;
+    case 3:
+        Mix_PlayChannel(-1, tone3, 0);
+        break;
+    }
 }
 
 USER_INPUT SDLManager::inputHandling()
@@ -344,25 +381,14 @@ USER_INPUT SDLManager::inputHandling()
     return NONE;
 };
 
-void SDLManager::drawMessage(std::string message,  int x, int y){
-    
-    textSurface = TTF_RenderText_Solid(font, message.c_str(), textColor);
-    text = SDL_CreateTextureFromSurface(renderer, textSurface);
-    text_width = textSurface->w;
-    text_height = textSurface->h;
-    SDL_FreeSurface(textSurface);
-    renderQuad = {x, y, text_width, text_height};
-    SDL_RenderCopy(renderer, text, NULL, &renderQuad);
-    SDL_DestroyTexture(text);
-
-}
-
 void SDLManager::drawScene(int scene)
 {
     if (Mix_PlayingMusic() == 0)
     {
         //Play the music
         Mix_PlayMusic(gMusic, -1);
+        Mix_VolumeMusic(0);
+        //Mix_VolumeMusic(MIX_MAX_VOLUME/8);
     }
 
     if (scene == 0)
@@ -378,7 +404,9 @@ void SDLManager::drawScene(int scene)
 void SDLManager::close()
 {
 
-    Mix_FreeChunk(gScratch);
+    Mix_FreeChunk(tone1);
+    Mix_FreeChunk(tone2);
+    Mix_FreeChunk(tone3);
     Mix_FreeMusic(gMusic);
     //Destroy window;
     SDL_DestroyRenderer(renderer);

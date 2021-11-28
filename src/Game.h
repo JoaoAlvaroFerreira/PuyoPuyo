@@ -1,9 +1,13 @@
+#ifndef GAME_H
+#define GAME_H
+
 #include <array>
 #include <vector>
 #include <bits/stdc++.h>
 #include <unistd.h>
 #include <random>
 #include "SDLManager.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -43,9 +47,12 @@ class Game
     int start_x = 3;
     int start_y = 0;
 
+    std::vector<int> scores;
     int highScore = 0;
-    int score_multiplier = 1;
-    int difficulty_level = 1;
+    int comboCounter = 0;
+    int difficultyLevel = 0;
+    int difficultyTresholds[5] = {100, 400, 1200, 2000, 3000};
+    double game_speed;
     Piece holding;
     bool holdingPiece = false;
     std::vector<Piece> nextPieces = {};
@@ -66,7 +73,7 @@ class Game
 
     SDLManager *sdl;
 
-    public:
+public:
     Game();
 
     int gameLoop();
@@ -104,6 +111,7 @@ class Game
     void setMessage(std::string message);
 
     bool emptyBoardCheck();
+    void difficultyCheck();
     bool checkLose();
 
     array<array<char, 16>, 8> getBoard()
@@ -116,3 +124,5 @@ class Game
         return highScore;
     }
 };
+
+#endif
