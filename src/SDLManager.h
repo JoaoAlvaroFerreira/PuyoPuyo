@@ -39,10 +39,10 @@ class SDLManager
     SDL_Rect sprite;
     SDL_Rect dest;
 
-    const int puyo_size = 32;
+    const int puyo_size = 40;
     //Screen dimension constants
-    const int SCREEN_WIDTH = 1024;
-    const int SCREEN_HEIGHT = 600;
+    const int SCREEN_WIDTH = 1280;
+    const int SCREEN_HEIGHT = 800;
     int board_start_h = (SCREEN_HEIGHT - (puyo_size * 16)) / 2;
     int board_start_w = (SCREEN_WIDTH - (puyo_size * 8)) / 2;
 
@@ -59,18 +59,18 @@ class SDLManager
     SDL_Texture *startMenuTex = NULL;
     SDL_Texture *gameOverTex = NULL;
     SDL_Texture *backgroundTex = NULL;
-    SDL_Texture *jackTex = NULL;
-    SDL_Texture *pacmanTex = NULL;
-    SDL_Texture *angryBirdTex = NULL;
+    SDL_Texture *blueTex = NULL;
+    SDL_Texture *yellowTex = NULL;
+    SDL_Texture *redTex = NULL;
     SDL_Texture *greenTex = NULL;
 
     //Current displayed PNG image
     SDL_Surface *startMenuPNG = NULL;
     SDL_Surface *gameOverPNG = NULL;
     SDL_Surface *backgroundPNG = NULL;
-    SDL_Surface *jackPNG = NULL;
-    SDL_Surface *pacmanPNG = NULL;
-    SDL_Surface *angryBirdPNG = NULL;
+    SDL_Surface *bluePNG = NULL;
+    SDL_Surface *yellowPNG = NULL;
+    SDL_Surface *redPNG = NULL;
     SDL_Surface *greenPNG = NULL;
 
     ///audio

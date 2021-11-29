@@ -46,6 +46,7 @@
         "algorithm": "cpp",
         "random": "cpp",
         "ratio": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "fstream": "cpp"
     }
 }

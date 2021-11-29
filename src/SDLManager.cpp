@@ -95,9 +95,9 @@ bool SDLManager::loadMedia()
     }
 
     //Load sound effects
-    tone1 = Mix_LoadWAV("res/hammer.wav");
-    tone2 = Mix_LoadWAV("res/metal.wav");
-    tone3 = Mix_LoadWAV("res/gulp.wav");
+    tone1 = Mix_LoadWAV("res/tone1.wav");
+    tone2 = Mix_LoadWAV("res/tone2.wav");
+    tone3 = Mix_LoadWAV("res/tone3.wav");
 
     startMenuPNG = IMG_Load("./res/start_menu.png");
     startMenuTex = SDL_CreateTextureFromSurface(renderer, startMenuPNG);
@@ -111,19 +111,19 @@ bool SDLManager::loadMedia()
     backgroundTex = SDL_CreateTextureFromSurface(renderer, backgroundPNG);
     SDL_FreeSurface(backgroundPNG);
     //Load PNG surface
-    jackPNG = IMG_Load("./res/jack32.png");
-    jackTex = SDL_CreateTextureFromSurface(renderer, jackPNG);
-    SDL_FreeSurface(jackPNG);
+    bluePNG = IMG_Load("./res/blue.png");
+    blueTex = SDL_CreateTextureFromSurface(renderer, bluePNG);
+    SDL_FreeSurface(bluePNG);
 
-    pacmanPNG = IMG_Load("./res/pacman32.png");
-    pacmanTex = SDL_CreateTextureFromSurface(renderer, pacmanPNG);
-    SDL_FreeSurface(pacmanPNG);
+    yellowPNG = IMG_Load("./res/yellow.png");
+    yellowTex = SDL_CreateTextureFromSurface(renderer, yellowPNG);
+    SDL_FreeSurface(yellowPNG);
 
-    angryBirdPNG = IMG_Load("./res/Red32.png");
-    angryBirdTex = SDL_CreateTextureFromSurface(renderer, angryBirdPNG);
-    SDL_FreeSurface(angryBirdPNG);
+    redPNG = IMG_Load("./res/red.png");
+    redTex = SDL_CreateTextureFromSurface(renderer, redPNG);
+    SDL_FreeSurface(redPNG);
 
-    greenPNG = IMG_Load("./res/1Up32.png");
+    greenPNG = IMG_Load("./res/green.png");
     greenTex = SDL_CreateTextureFromSurface(renderer, greenPNG);
     SDL_FreeSurface(greenPNG);
 
@@ -141,13 +141,13 @@ void SDLManager::drawBlock(char block)
     {
 
     case '1':
-        SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
+        SDL_RenderCopy(renderer, blueTex, &sprite, &dest);
         break;
     case '2':
-        SDL_RenderCopy(renderer, pacmanTex, &sprite, &dest);
+        SDL_RenderCopy(renderer, yellowTex, &sprite, &dest);
         break;
     case '3':
-        SDL_RenderCopy(renderer, angryBirdTex, &sprite, &dest);
+        SDL_RenderCopy(renderer, redTex, &sprite, &dest);
         break;
     case '4':
         SDL_RenderCopy(renderer, greenTex, &sprite, &dest);
@@ -182,12 +182,12 @@ void SDLManager::drawPieceList(std::array<std::array<char, 2>, 3> pieceList)
     for (int k = 0; k < pieceList.size(); k++)
     {
 
-        dest.x = board_start_w + (puyo_size * 8);
-        dest.y = k * puyo_size + board_start_h;
+        dest.x = board_start_w + (puyo_size * 8) + 25;
+        dest.y = k * puyo_size + board_start_h + 5;
 
         drawBlock(pieceList[k][0]);
 
-        dest.x = board_start_w + (puyo_size * 9);
+        dest.x = board_start_w + (puyo_size * 9) + 25;
 
         drawBlock(pieceList[k][1]);
     }
@@ -195,12 +195,12 @@ void SDLManager::drawPieceList(std::array<std::array<char, 2>, 3> pieceList)
 
 void SDLManager::drawHolding(char holding[2])
 {
-    dest.x = board_start_w - puyo_size * 2;
-    dest.y = board_start_h;
+    dest.x = board_start_w - puyo_size * 2 - 15;
+    dest.y = board_start_h + 5;
 
     drawBlock(holding[0]);
 
-    dest.x = board_start_w - puyo_size;
+    dest.x = board_start_w - puyo_size - 15;
 
     drawBlock(holding[1]);
 }
@@ -218,10 +218,10 @@ void SDLManager::drawGame(std::array<std::array<char, 16>, 8> board, int score, 
     drawHolding(holding);
 
     std::string score_text = "Current score: " + std::to_string(score);
-    drawMessage(score_text, 50, SCREEN_HEIGHT - 50);
+    drawMessage(score_text, 50, SCREEN_HEIGHT - 100);
 
     if (message.compare(" "))
-        drawMessage(message, SCREEN_WIDTH - 150, SCREEN_HEIGHT - 50);
+        drawMessage(message, SCREEN_WIDTH - 400, SCREEN_HEIGHT - 100);
 
     SDL_RenderPresent(renderer);
 
@@ -232,12 +232,12 @@ void SDLManager::drawGame(std::array<std::array<char, 16>, 8> board, int score, 
 
 void SDLManager::drawScores(std::vector<int> scores)
 {
-    drawMessage("Scores", 0, 0);
+    drawMessage("Scores", 50, 50 );
 
     for (int i = 0; i < scores.size(); i++)
     {
 
-        drawMessage(std::to_string(scores[i]), 50, (i + 1) * text_height);
+        drawMessage(std::to_string(scores[i]), 100 , 50 + (i + 1) * text_height);
     }
 }
 void SDLManager::drawMessage(std::string message, int x, int y)

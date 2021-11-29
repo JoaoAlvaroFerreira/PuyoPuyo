@@ -74,18 +74,18 @@ int Game::gameLoop()
         sdl->drawGame(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 0);
     }
 
-
     return 0;
 }
 
-void Game::writeScore(){
+void Game::writeScore()
+{
 
     scores.push_back(highScore);
     std::sort(scores.begin(), scores.end(), std::greater<int>());
 
-    while(scores.size() > MAX_SCORES_SAVED)
+    while (scores.size() > MAX_SCORES_SAVED)
         scores.pop_back();
-    
+
     write_scores(scores);
 }
 
@@ -116,13 +116,13 @@ void Game::hold()
         player = holding;
     }
 
-    clearPieceOnBoard();
-
     player.a.posX = aux.a.posX;
     player.a.posY = aux.a.posY;
     player.b.posX = aux.b.posX;
     player.b.posY = aux.b.posY;
-
+    player.orientation = aux.orientation;
+    
+    clearPieceOnBoard();
     printPieceOnBoard();
 
     holding = aux;
@@ -130,6 +130,7 @@ void Game::hold()
     holding.a.posY = start_y;
     holding.b.posX = start_x + 1;
     holding.b.posY = start_y;
+    holding.orientation = NEUTRAL;
 
     holdingDrawable[0] = holding.a.num;
     holdingDrawable[1] = holding.b.num;
@@ -323,12 +324,14 @@ void Game::movePiece(USER_INPUT input)
     switch (input)
     {
 
-    case UP: ////////////CHECK THAT YOU CAN'T DELETE PIECES FROM BELOW OR BY SPINNING
+    case UP:
         if (player.a.posY < 15 && player.b.posY < 15)
         {
             while (!collisionCheck())
                 boardMovement(0, 1);
         }
+
+
 
         break;
 
@@ -339,7 +342,7 @@ void Game::movePiece(USER_INPUT input)
         }
         break;
     case LEFT:
-        if (player.a.posX > 0 && player.b.posX > 0 && leftCheck()) /////////WRITE THE CHECKS FOR WHEN YOU BUMP INTO PIECES SIDEWAYS, INCLUDING ALL ORIENTATIONS, ALSO FIX CHECK DROP
+        if (player.a.posX > 0 && player.b.posX > 0 && leftCheck())
         {
             boardMovement(-1, 0);
         }
@@ -640,8 +643,8 @@ void Game::deleteFloodfillBlocks()
         columns.push_back(currentFlood[i].posX);
     }
 
-    deleteBlocksEffect(oldBoard);
     comboCounter++;
+    deleteBlocksEffect(oldBoard);
     highScore = highScore + (10 * currentFlood.size() * comboCounter) * (difficultyLevel * 0.2 + 1);
 
     for (int j = 0; j < columns.size(); j++)
@@ -676,7 +679,13 @@ void Game::deleteBlocksEffect(array<array<char, 16>, 8> oldBoard)
         sdl->drawGame(oldBoard, getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
         sdl->drawGame(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
     }
-    sdl->playSoundEffect(1);
+
+    if (comboCounter == 1)
+        sdl->playSoundEffect(1);
+    else if (comboCounter == 2)
+        sdl->playSoundEffect(2);
+    else if (comboCounter > 2)
+        sdl->playSoundEffect(3);
 }
 
 void Game::setMessage(std::string newMessage)
