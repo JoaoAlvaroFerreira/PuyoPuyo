@@ -98,7 +98,15 @@ public:
 
     USER_INPUT inputHandling();
 
-    void drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay);
+    void drawGame(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay);
+
+    void drawBlock(char block);
+
+    void drawBoard(std::array<std::array<char, 16>, 8> board);
+
+    void drawPieceList( std::array<std::array<char, 2>, 3> pieceList);
+
+    void drawHolding(char holding[2]);
 
     void drawMessage(std::string message, int x, int y);
 

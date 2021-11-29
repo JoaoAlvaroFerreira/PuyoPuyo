@@ -44,14 +44,14 @@ class Game
     Block firstBlock;
     Block secondBlock;
 
-    int start_x = 3;
-    int start_y = 0;
+    const int start_x = 3;
+    const int start_y = 0;
 
     std::vector<int> scores;
     int highScore = 0;
     int comboCounter = 0;
     int difficultyLevel = 0;
-    int difficultyTresholds[5] = {100, 400, 1200, 2000, 3000};
+    const int difficultyTresholds[5] = {100, 400, 1200, 2000, 3000};
     double game_speed;
     Piece holding;
     bool holdingPiece = false;
@@ -64,8 +64,9 @@ class Game
     std::vector<Block> currentFlood = {};
     int floodCounter = 0;
 
-    char EMPTY_SPACE = '0';
-    char possibleBlocks[4] = {'1', '2', '3', '4'};
+    const char EMPTY_SPACE = '0';
+    const int MAX_SCORES_SAVED = 8;
+    const char possibleBlocks[4] = {'1', '2', '3', '4'};
 
     std::chrono::time_point<std::chrono::system_clock> messageClock;
     std::string currentMessage = " ";
@@ -87,7 +88,6 @@ public:
 
     bool rightCheck();
     bool leftCheck();
-
     bool collisionCheck();
     bool groundCheck();
     bool pieceCollisionCheck();
@@ -113,6 +113,7 @@ public:
     bool emptyBoardCheck();
     void difficultyCheck();
     bool checkLose();
+    void writeScore();
 
     array<array<char, 16>, 8> getBoard()
     {

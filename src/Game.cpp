@@ -22,8 +22,7 @@ int Game::gameLoop()
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::duration<double> time_aux;
     start = std::chrono::system_clock::now();
-    difficultyLevel = 0;
-    game_speed = 0.6 - difficultyLevel * 0.05;
+    game_speed = 0.6 - difficultyLevel * 0.1;
     //While application is running
     while (!quit)
     {
@@ -32,6 +31,7 @@ int Game::gameLoop()
         if (input == QUIT)
         {
             quit = true;
+            writeScore();
         }
         else
         {
@@ -58,6 +58,7 @@ int Game::gameLoop()
                 if (checkLose())
                 {
                     quit = true;
+                    writeScore();
                     return 1;
                 }
                 else
@@ -70,14 +71,22 @@ int Game::gameLoop()
                 movePiece(input);
             }
         }
-        sdl->drawBoard(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 0);
+        sdl->drawGame(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 0);
     }
 
-    scores.push_back(highScore);
-    std::sort(scores.begin(), scores.end());
-    write_scores(scores);
 
     return 0;
+}
+
+void Game::writeScore(){
+
+    scores.push_back(highScore);
+    std::sort(scores.begin(), scores.end(), std::greater<int>());
+
+    while(scores.size() > MAX_SCORES_SAVED)
+        scores.pop_back();
+    
+    write_scores(scores);
 }
 
 void Game::initPieces()
@@ -664,8 +673,8 @@ void Game::deleteBlocksEffect(array<array<char, 16>, 8> oldBoard)
     for (int i = 0; i < 5; i++)
     {
 
-        sdl->drawBoard(oldBoard, getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
-        sdl->drawBoard(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
+        sdl->drawGame(oldBoard, getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
+        sdl->drawGame(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
     }
     sdl->playSoundEffect(1);
 }

@@ -69,6 +69,15 @@ bool SDLManager::init()
         }
     }
 
+    sprite.x = 0;
+    sprite.y = 0;
+    sprite.h = puyo_size;
+    sprite.w = puyo_size;
+    dest.x = 0;
+    dest.y = 0;
+    dest.h = puyo_size;
+    dest.w = puyo_size;
+
     return success;
 };
 
@@ -126,53 +135,49 @@ bool SDLManager::loadMedia()
     return success;
 };
 
-void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay) /////////////CLEAN UP ASAP
+void SDLManager::drawBlock(char block)
 {
-    SDL_RenderCopy(renderer, backgroundTex, NULL, NULL);
+    switch (block)
+    {
 
-    dest.x = 0;
-    dest.y = 0;
-    dest.h = puyo_size;
-    dest.w = puyo_size;
+    case '1':
+        SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
+        break;
+    case '2':
+        SDL_RenderCopy(renderer, pacmanTex, &sprite, &dest);
+        break;
+    case '3':
+        SDL_RenderCopy(renderer, angryBirdTex, &sprite, &dest);
+        break;
+    case '4':
+        SDL_RenderCopy(renderer, greenTex, &sprite, &dest);
+        break;
 
-    sprite.x = 0;
-    sprite.y = 0;
-    sprite.h = puyo_size;
-    sprite.w = puyo_size;
+    default:
+        break;
+    }
+}
 
-    drawScores(scores);
+void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board)
+{
 
     for (int i = 0; i < board.size(); i++)
     {
         for (int j = 0; j < board.at(i).size(); j++)
         {
-            if (board.at(i).at(j) != 0)
+            if (board.at(i).at(j) != '0')
             {
                 dest.x = i * puyo_size + board_start_w;
                 dest.y = j * puyo_size + board_start_h;
             }
 
-            switch (board.at(i).at(j))
-            {
-
-            case '1':
-                SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
-                break;
-            case '2':
-                SDL_RenderCopy(renderer, pacmanTex, &sprite, &dest);
-                break;
-            case '3':
-                SDL_RenderCopy(renderer, angryBirdTex, &sprite, &dest);
-                break;
-            case '4':
-                SDL_RenderCopy(renderer, greenTex, &sprite, &dest);
-                break;
-
-            default:
-                break;
-            }
+            drawBlock(board.at(i).at(j));
         }
     }
+}
+
+void SDLManager::drawPieceList(std::array<std::array<char, 2>, 3> pieceList)
+{
 
     for (int k = 0; k < pieceList.size(); k++)
     {
@@ -180,100 +185,43 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score,
         dest.x = board_start_w + (puyo_size * 8);
         dest.y = k * puyo_size + board_start_h;
 
-        switch (pieceList[k][0])
-        {
-
-        case '1':
-            SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
-            break;
-        case '2':
-            SDL_RenderCopy(renderer, pacmanTex, &sprite, &dest);
-            break;
-        case '3':
-            SDL_RenderCopy(renderer, angryBirdTex, &sprite, &dest);
-            break;
-        case '4':
-            SDL_RenderCopy(renderer, greenTex, &sprite, &dest);
-            break;
-
-        default:
-            break;
-        }
+        drawBlock(pieceList[k][0]);
 
         dest.x = board_start_w + (puyo_size * 9);
 
-        switch (pieceList[k][1])
-        {
-
-        case '1':
-            SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
-            break;
-        case '2':
-            SDL_RenderCopy(renderer, pacmanTex, &sprite, &dest);
-            break;
-        case '3':
-            SDL_RenderCopy(renderer, angryBirdTex, &sprite, &dest);
-            break;
-        case '4':
-            SDL_RenderCopy(renderer, greenTex, &sprite, &dest);
-            break;
-
-        default:
-            break;
-        }
+        drawBlock(pieceList[k][1]);
     }
+}
 
+void SDLManager::drawHolding(char holding[2])
+{
     dest.x = board_start_w - puyo_size * 2;
     dest.y = board_start_h;
-    switch (holding[0])
-    {
 
-    case '1':
-        SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
-        break;
-    case '2':
-        SDL_RenderCopy(renderer, pacmanTex, &sprite, &dest);
-        break;
-    case '3':
-        SDL_RenderCopy(renderer, angryBirdTex, &sprite, &dest);
-        break;
-    case '4':
-        SDL_RenderCopy(renderer, greenTex, &sprite, &dest);
-        break;
-
-    default:
-        break;
-    }
+    drawBlock(holding[0]);
 
     dest.x = board_start_w - puyo_size;
 
-    switch (holding[1])
-    {
+    drawBlock(holding[1]);
+}
 
-    case '1':
-        SDL_RenderCopy(renderer, jackTex, &sprite, &dest);
-        break;
-    case '2':
-        SDL_RenderCopy(renderer, pacmanTex, &sprite, &dest);
-        break;
-    case '3':
-        SDL_RenderCopy(renderer, angryBirdTex, &sprite, &dest);
-        break;
-    case '4':
-        SDL_RenderCopy(renderer, greenTex, &sprite, &dest);
-        break;
+void SDLManager::drawGame(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay) /////////////CLEAN UP ASAP
+{
+    SDL_RenderCopy(renderer, backgroundTex, NULL, NULL);
 
-    default:
-        break;
-    }
+    drawScores(scores);
 
-    ////WRITE TEXT
+    drawBoard(board);
 
-    std::string score_text = "Score: " + std::to_string(score);
+    drawPieceList(pieceList);
+
+    drawHolding(holding);
+
+    std::string score_text = "Current score: " + std::to_string(score);
     drawMessage(score_text, 50, SCREEN_HEIGHT - 50);
 
     if (message.compare(" "))
-        drawMessage(message, 50, 50);
+        drawMessage(message, SCREEN_WIDTH - 150, SCREEN_HEIGHT - 50);
 
     SDL_RenderPresent(renderer);
 
@@ -284,17 +232,12 @@ void SDLManager::drawBoard(std::array<std::array<char, 16>, 8> board, int score,
 
 void SDLManager::drawScores(std::vector<int> scores)
 {
+    drawMessage("Scores", 0, 0);
+
     for (int i = 0; i < scores.size(); i++)
     {
 
-        textSurface = TTF_RenderText_Solid(font, std::to_string(scores[i]).c_str(), textColor);
-        text = SDL_CreateTextureFromSurface(renderer, textSurface);
-        text_width = textSurface->w;
-        text_height = textSurface->h;
-        SDL_FreeSurface(textSurface);
-        renderQuad = {50, i*text_height, text_width, text_height};
-        SDL_RenderCopy(renderer, text, NULL, &renderQuad);
-        SDL_DestroyTexture(text);
+        drawMessage(std::to_string(scores[i]), 50, (i + 1) * text_height);
     }
 }
 void SDLManager::drawMessage(std::string message, int x, int y)
@@ -387,8 +330,7 @@ void SDLManager::drawScene(int scene)
     {
         //Play the music
         Mix_PlayMusic(gMusic, -1);
-        Mix_VolumeMusic(0);
-        //Mix_VolumeMusic(MIX_MAX_VOLUME/8);
+        Mix_VolumeMusic(MIX_MAX_VOLUME / 8);
     }
 
     if (scene == 0)
@@ -414,6 +356,7 @@ void SDLManager::close()
     gWindow = NULL;
 
     //Quit SDL subsystems
+    TTF_Quit();
     Mix_Quit();
     IMG_Quit();
     SDL_Quit();

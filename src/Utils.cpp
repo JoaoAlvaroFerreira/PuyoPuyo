@@ -31,6 +31,7 @@ int write_scores(std::vector<int> scores)
         for (int i = 0; i < scores.size(); i++)
             myfile << scores[i] << "\n";
 
+
         myfile.close();
 
         return 1;
