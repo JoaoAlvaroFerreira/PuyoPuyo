@@ -344,7 +344,7 @@ void SDLManager::drawScene(int scene, bool first)
     {
         //Play the music
         Mix_PlayMusic(gMusic, -1);
-        Mix_VolumeMusic(MIX_MAX_VOLUME / 8);
+        Mix_VolumeMusic(MIX_MAX_VOLUME / 6);
     }
 
     if (scene == 0)

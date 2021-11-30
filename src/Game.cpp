@@ -668,7 +668,7 @@ void Game::deleteFloodfillBlocks()
     if (emptyBoardCheck())
     {
         setMessage("FULL CLEAR !");
-        highScore = highScore + 500;
+        highScore = highScore + 500* (difficultyLevel * 0.3 + 1);
     }
 
     difficultyCheck();

@@ -101,18 +101,21 @@ void sceneManagement(SDLManager *sdl)
 		switch (currentScene)
 		{
 		case START_MENU:
-			sdl->clearKeyEventsQueue();
+			
 			startMenuLoop(sdl);
+			sdl->clearKeyEventsQueue();
 			break;
 		case HOW_TO_PLAY:
-			sdl->clearKeyEventsQueue();
+			
 			howToPlayLoop(sdl);
+			sdl->clearKeyEventsQueue();
 			break;
 		case GAME:
 			game = new Game();
 			game->setGraphics(sdl);
 
 			end_game_state = game->gameLoop();
+			sdl->clearKeyEventsQueue();
 
 			if (end_game_state == 0)
 				currentScene = QUIT_GAME;
@@ -122,8 +125,9 @@ void sceneManagement(SDLManager *sdl)
 			break;
 
 		case GAME_OVER:
-			sdl->clearKeyEventsQueue();
+			
 			gameOverLoop(sdl);
+			sdl->clearKeyEventsQueue();
 			break;
 		default:
 			currentScene = START_MENU;
