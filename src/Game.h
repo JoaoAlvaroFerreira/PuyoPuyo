@@ -52,7 +52,7 @@ class Game
     int comboCounter = 0;
     int difficultyLevel = 0;
     const int difficultyTresholds[10] = {100, 400, 1200, 2000, 3000, 4500, 6000, 8000, 10000, 12000};
-    double game_speed;
+    double game_speed = 0.6;
     Piece holding;
     bool holdingPiece = false;
     std::vector<Piece> nextPieces = {};
@@ -70,7 +70,7 @@ class Game
 
     std::chrono::time_point<std::chrono::system_clock> messageClock;
     std::string currentMessage = " ";
-    double messageTime = 2;
+    const double messageTime = 2;
 
     bool pause;
 

@@ -24,22 +24,22 @@ int Game::gameLoop()
     std::chrono::duration<double> time_aux;
     start = std::chrono::system_clock::now();
 
-    game_speed = 0.6 - difficultyLevel * 0.06;
+
     //While application is running
     while (!quit)
     {
         USER_INPUT input = sdl->inputHandling();
 
-        if(input == PAUSE)
+        if (input == PAUSE)
             pause = !pause;
-     
+
         if (input == QUIT)
         {
             quit = true;
             writeScore();
         }
-        
-        if(!pause)
+
+        if (!pause)
         {
             time_aux = std::chrono::system_clock::now() - start;
 
@@ -63,6 +63,7 @@ int Game::gameLoop()
 
                 if (checkLose())
                 {
+                    sdl->drawGame(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 1000, pause);
                     quit = true;
                     writeScore();
                     return 1;
@@ -127,7 +128,7 @@ void Game::hold()
     player.b.posX = aux.b.posX;
     player.b.posY = aux.b.posY;
     player.orientation = aux.orientation;
-    
+
     clearPieceOnBoard();
     printPieceOnBoard();
 
@@ -711,12 +712,12 @@ bool Game::emptyBoardCheck()
 void Game::difficultyCheck()
 {
 
-    if (difficultyLevel < sizeof(difficultyTresholds) / sizeof(difficultyTresholds[0]))
+    if (difficultyLevel < 10)
     {
         if (highScore > difficultyTresholds[difficultyLevel])
         {
             difficultyLevel++;
-            game_speed = 0.6 - difficultyLevel * 0.06;
+            game_speed = 0.6 - difficultyLevel * 0.055;
         }
     }
 }

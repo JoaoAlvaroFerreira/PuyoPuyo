@@ -44,8 +44,8 @@ class SDLManager
     //Screen dimension constants
     const int SCREEN_WIDTH = 1280;
     const int SCREEN_HEIGHT = 800;
-    int board_start_h = (SCREEN_HEIGHT - (puyo_size * 16)) / 2;
-    int board_start_w = (SCREEN_WIDTH - (puyo_size * 8)) / 2;
+    const int board_start_h = (SCREEN_HEIGHT - (puyo_size * 16)) / 2;
+    const int board_start_w = (SCREEN_WIDTH - (puyo_size * 8)) / 2;
 
     SDL_Event e;
 
@@ -85,7 +85,7 @@ class SDLManager
     Mix_Chunk *tone2 = NULL;
     Mix_Chunk *tone3 = NULL;
 
-    SDL_Color textColor = {255, 255, 255, 0};
+    const SDL_Color textColor = {255, 255, 255, 0};
     SDL_Surface *textSurface;
     SDL_Texture *text;
     int text_width;
@@ -119,7 +119,7 @@ public:
 
     void drawScene(int scene, bool first);
 
-    void keys();
+    void clearKeyEventsQueue();
 
     void close();
 };

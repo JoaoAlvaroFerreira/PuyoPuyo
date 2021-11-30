@@ -339,6 +339,7 @@ USER_INPUT SDLManager::inputHandling()
 
 void SDLManager::drawScene(int scene, bool first)
 {
+
     if (Mix_PlayingMusic() == 0)
     {
         //Play the music
@@ -355,10 +356,15 @@ void SDLManager::drawScene(int scene, bool first)
 
     SDL_RenderPresent(renderer);
 
-    if(first)
+    if (first)
         SDL_Delay(1000);
 
     SDL_RenderClear(renderer);
+}
+
+void SDLManager::clearKeyEventsQueue()
+{
+    SDL_FlushEvent(SDL_KEYDOWN);
 }
 
 void SDLManager::close()
