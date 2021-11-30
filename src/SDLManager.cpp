@@ -87,7 +87,7 @@ bool SDLManager::loadMedia()
     bool success = true;
 
     //Load music
-    gMusic = Mix_LoadMUS("res/fh.wav");
+    gMusic = Mix_LoadMUS("res/music.wav");
     if (gMusic == NULL)
     {
         printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
@@ -102,6 +102,10 @@ bool SDLManager::loadMedia()
     startMenuPNG = IMG_Load("./res/start_menu.png");
     startMenuTex = SDL_CreateTextureFromSurface(renderer, startMenuPNG);
     SDL_FreeSurface(startMenuPNG);
+
+    howToPlayPNG = IMG_Load("./res/how_to_play.png");
+    howToPlayTex = SDL_CreateTextureFromSurface(renderer, howToPlayPNG);
+    SDL_FreeSurface(howToPlayPNG);
 
     gameOverPNG = IMG_Load("./res/game_over.png");
     gameOverTex = SDL_CreateTextureFromSurface(renderer, gameOverPNG);
@@ -205,7 +209,7 @@ void SDLManager::drawHolding(char holding[2])
     drawBlock(holding[1]);
 }
 
-void SDLManager::drawGame(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay) /////////////CLEAN UP ASAP
+void SDLManager::drawGame(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay, bool pause) /////////////CLEAN UP ASAP
 {
     SDL_RenderCopy(renderer, backgroundTex, NULL, NULL);
 
@@ -223,6 +227,11 @@ void SDLManager::drawGame(std::array<std::array<char, 16>, 8> board, int score, 
     if (message.compare(" "))
         drawMessage(message, SCREEN_WIDTH - 400, SCREEN_HEIGHT - 100);
 
+    if (pause)
+    {
+        drawMessage("PAUSE", SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT / 2 - 50);
+    }
+
     SDL_RenderPresent(renderer);
 
     SDL_Delay(delay);
@@ -232,12 +241,12 @@ void SDLManager::drawGame(std::array<std::array<char, 16>, 8> board, int score, 
 
 void SDLManager::drawScores(std::vector<int> scores)
 {
-    drawMessage("Scores", 50, 50 );
+    drawMessage("High Scores:", 50, 50);
 
     for (int i = 0; i < scores.size(); i++)
     {
 
-        drawMessage(std::to_string(scores[i]), 100 , 50 + (i + 1) * text_height);
+        drawMessage(std::to_string(scores[i]), 100, 50 + (i + 1) * text_height);
     }
 }
 void SDLManager::drawMessage(std::string message, int x, int y)
@@ -314,6 +323,10 @@ USER_INPUT SDLManager::inputHandling()
             case SDLK_SPACE:
                 return SPACE;
                 break;
+            case SDLK_ESCAPE:
+            case SDLK_KP_ENTER:
+            case SDLK_RETURN:
+                return PAUSE;
             default:
                 return NONE;
                 break;
@@ -324,7 +337,7 @@ USER_INPUT SDLManager::inputHandling()
     return NONE;
 };
 
-void SDLManager::drawScene(int scene)
+void SDLManager::drawScene(int scene, bool first)
 {
     if (Mix_PlayingMusic() == 0)
     {
@@ -336,9 +349,14 @@ void SDLManager::drawScene(int scene)
     if (scene == 0)
         SDL_RenderCopy(renderer, startMenuTex, NULL, NULL);
     else if (scene == 1)
+        SDL_RenderCopy(renderer, howToPlayTex, NULL, NULL);
+    else if (scene == 2)
         SDL_RenderCopy(renderer, gameOverTex, NULL, NULL);
 
     SDL_RenderPresent(renderer);
+
+    if(first)
+        SDL_Delay(1000);
 
     SDL_RenderClear(renderer);
 }

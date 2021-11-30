@@ -27,6 +27,7 @@ enum USER_INPUT
     ROTATE_RIGHT,
     ROTATE_LEFT,
     SPACE,
+    PAUSE,
     QUIT,
     NONE
 };
@@ -57,6 +58,7 @@ class SDLManager
 
     SDL_Texture *mTexture = NULL;
     SDL_Texture *startMenuTex = NULL;
+    SDL_Texture *howToPlayTex = NULL;
     SDL_Texture *gameOverTex = NULL;
     SDL_Texture *backgroundTex = NULL;
     SDL_Texture *blueTex = NULL;
@@ -66,6 +68,7 @@ class SDLManager
 
     //Current displayed PNG image
     SDL_Surface *startMenuPNG = NULL;
+    SDL_Surface *howToPlayPNG = NULL;
     SDL_Surface *gameOverPNG = NULL;
     SDL_Surface *backgroundPNG = NULL;
     SDL_Surface *bluePNG = NULL;
@@ -98,13 +101,13 @@ public:
 
     USER_INPUT inputHandling();
 
-    void drawGame(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay);
+    void drawGame(std::array<std::array<char, 16>, 8> board, int score, std::vector<int> scores, std::array<std::array<char, 2>, 3> pieceList, char holding[2], std::string message, float delay, bool pause);
 
     void drawBlock(char block);
 
     void drawBoard(std::array<std::array<char, 16>, 8> board);
 
-    void drawPieceList( std::array<std::array<char, 2>, 3> pieceList);
+    void drawPieceList(std::array<std::array<char, 2>, 3> pieceList);
 
     void drawHolding(char holding[2]);
 
@@ -114,7 +117,7 @@ public:
 
     void playSoundEffect(int i);
 
-    void drawScene(int scene);
+    void drawScene(int scene, bool first);
 
     void keys();
 

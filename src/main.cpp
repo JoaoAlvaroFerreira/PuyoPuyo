@@ -22,6 +22,32 @@ void startMenuLoop(SDLManager *sdl)
 
 	bool quit = false;
 
+	sdl->drawScene(0, true);
+	//While application is running
+	while (!quit)
+	{
+		USER_INPUT input = sdl->inputHandling();
+
+		if (input == QUIT)
+		{
+			quit = true;
+			currentScene = QUIT_GAME;
+		}
+		else if (input != NONE)
+		{
+			currentScene = HOW_TO_PLAY;
+			return;
+		}
+		sdl->drawScene(0, false);
+	}
+}
+
+void howToPlayLoop(SDLManager *sdl)
+{
+
+	bool quit = false;
+	
+	sdl->drawScene(1, true);
 	//While application is running
 	while (!quit)
 	{
@@ -37,16 +63,17 @@ void startMenuLoop(SDLManager *sdl)
 			currentScene = GAME;
 			return;
 		}
-		sdl->drawScene(0);
+		sdl->drawScene(1, false);
 	}
 }
 
-void GameOverLoop(SDLManager *sdl)
+void gameOverLoop(SDLManager *sdl)
 {
 
 	bool quit = false;
 
 	//While application is running
+	sdl->drawScene(2, true);
 	while (!quit)
 	{
 		USER_INPUT input = sdl->inputHandling();
@@ -61,7 +88,7 @@ void GameOverLoop(SDLManager *sdl)
 			currentScene = START_MENU;
 			return;
 		}
-		sdl->drawScene(1);
+		sdl->drawScene(2, false);
 	}
 }
 
@@ -76,6 +103,8 @@ void sceneManagement(SDLManager *sdl)
 		case START_MENU:
 			startMenuLoop(sdl);
 			break;
+		case HOW_TO_PLAY:
+			howToPlayLoop(sdl);
 		case GAME:
 			game = new Game();
 			game->setGraphics(sdl);
@@ -90,7 +119,7 @@ void sceneManagement(SDLManager *sdl)
 			break;
 
 		case GAME_OVER:
-			GameOverLoop(sdl);
+			gameOverLoop(sdl);
 			break;
 		default:
 			currentScene = START_MENU;

@@ -13,6 +13,7 @@ Game::Game()
     scores = read_scores();
     initPieces();
     assignPiece(false);
+    pause = false;
 };
 
 int Game::gameLoop()
@@ -22,18 +23,23 @@ int Game::gameLoop()
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::duration<double> time_aux;
     start = std::chrono::system_clock::now();
-    game_speed = 0.6 - difficultyLevel * 0.1;
+
+    game_speed = 0.6 - difficultyLevel * 0.06;
     //While application is running
     while (!quit)
     {
         USER_INPUT input = sdl->inputHandling();
 
+        if(input == PAUSE)
+            pause = !pause;
+     
         if (input == QUIT)
         {
             quit = true;
             writeScore();
         }
-        else
+        
+        if(!pause)
         {
             time_aux = std::chrono::system_clock::now() - start;
 
@@ -71,7 +77,7 @@ int Game::gameLoop()
                 movePiece(input);
             }
         }
-        sdl->drawGame(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 0);
+        sdl->drawGame(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 0, pause);
     }
 
     return 0;
@@ -331,8 +337,6 @@ void Game::movePiece(USER_INPUT input)
                 boardMovement(0, 1);
         }
 
-
-
         break;
 
     case DOWN:
@@ -367,7 +371,6 @@ void Game::movePiece(USER_INPUT input)
         hold();
 
         break;
-
     default:
         break;
     }
@@ -645,7 +648,7 @@ void Game::deleteFloodfillBlocks()
 
     comboCounter++;
     deleteBlocksEffect(oldBoard);
-    highScore = highScore + (10 * currentFlood.size() * comboCounter) * (difficultyLevel * 0.2 + 1);
+    highScore = highScore + (10 * currentFlood.size() * comboCounter) * (difficultyLevel * 0.3 + 1);
 
     for (int j = 0; j < columns.size(); j++)
         columnDrop(columns[j], true);
@@ -676,8 +679,8 @@ void Game::deleteBlocksEffect(array<array<char, 16>, 8> oldBoard)
     for (int i = 0; i < 5; i++)
     {
 
-        sdl->drawGame(oldBoard, getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
-        sdl->drawGame(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50);
+        sdl->drawGame(oldBoard, getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50, pause);
+        sdl->drawGame(getBoard(), getScore(), scores, nextPiecesDrawable, holdingDrawable, currentMessage, 50, pause);
     }
 
     if (comboCounter == 1)
@@ -713,9 +716,7 @@ void Game::difficultyCheck()
         if (highScore > difficultyTresholds[difficultyLevel])
         {
             difficultyLevel++;
-            game_speed = 0.6 - difficultyLevel * 0.1;
-            std::string str = "Difficulty level:" + std::to_string(difficultyLevel);
-            setMessage(str);
+            game_speed = 0.6 - difficultyLevel * 0.06;
         }
     }
 }
