@@ -9,8 +9,3 @@ With MinGW installed, simply running "make puyo" inside the src file should gene
 
 There is an intended delay and event flush after each scene change in the game, so that players don't accidentally skip scenes (skipping the How to Play instructions, 
 for example).
-
-The choice to take care of all of the game logic in one Game class instead of sub-dividing the elements into a class for Block, Piece, Board, etc. was
-done in service of simplicity. Given that a hypothetical Block or Piece class would have nearly no member functions of its own outside of getters and setters,
-I thought defining them as structs would make the code and overall development more straight-forward. This was done taking into account the small scope
-of the project and short timeframe.
